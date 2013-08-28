@@ -1,16 +1,13 @@
-import os
 import pprint
 import sched
 import time
 import pickle
 from selenium import webdriver
 import sys
-import getpass
+from credentials import USERNAME, PASSWORD
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
-username = 'rvachterberg@gmail.com'
-password = getpass.getpass()
 
 def log(msg):
     # to avoid encoding hell:
@@ -104,10 +101,10 @@ def start_browser(url):
     log("Starting browser")
     chrome_options = webdriver.ChromeOptions()
     chrome_options._arguments = ["--user-data-dir=/home/rik/.config/google-chrome/Default/", "--incognito"]
-    browser = webdriver.Chrome(chrome_options=chrome_options)
-    #    profile = webdriver.FirefoxProfile()
-#    profile.native_events_enabled = True
-#    browser = webdriver.Firefox(profile)
+#    browser = webdriver.Chrome(chrome_options=chrome_options)
+    profile = webdriver.FirefoxProfile()
+    profile.native_events_enabled = True
+    browser = webdriver.Firefox(profile)
 #    browser = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNITWITHJS)
     log("Opening url '%s'" % url)
     browser.get(url)
@@ -201,8 +198,8 @@ def do_login(browser, return_url=None):
     fieldset = form.find_element_by_tag_name('fieldset')
     button = fieldset.find_elements_by_tag_name('input')[-1]
 
-    email.send_keys(username)
-    passwd.send_keys(password)
+    email.send_keys(USERNAME)
+    passwd.send_keys(PASSWORD)
     button.click()
 
     counter = 0
