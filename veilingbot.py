@@ -101,10 +101,10 @@ def start_browser(url):
     log("Starting browser")
     chrome_options = webdriver.ChromeOptions()
     chrome_options._arguments = ["--user-data-dir=/home/rik/.config/google-chrome/Default/", "--incognito"]
-#    browser = webdriver.Chrome(chrome_options=chrome_options)
-    profile = webdriver.FirefoxProfile()
-    profile.native_events_enabled = True
-    browser = webdriver.Firefox(profile)
+    browser = webdriver.Chrome(chrome_options=chrome_options)
+#    profile = webdriver.FirefoxProfile()
+#    profile.native_events_enabled = True
+#    browser = webdriver.Firefox(profile)
 #    browser = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNITWITHJS)
     log("Opening url '%s'" % url)
     browser.get(url)
@@ -191,6 +191,10 @@ def do_login(browser, return_url=None):
     browser.get("https://www.vakantieveilingen.nl/login.html")
     log('Waiting 5 secs')
     time.sleep(5)
+
+    open_login = browser.find_element_by_class_name('openLogin')
+    open_login.click()
+
     email = browser.find_element_by_id('loginEmailField')
     passwd = browser.find_element_by_id('loginPasswordField')
 
@@ -204,7 +208,7 @@ def do_login(browser, return_url=None):
 
     counter = 0
     log('Waiting max. 60 seconds')
-    while browser.current_url != "https://www.vakantieveilingen.nl/myauctions/":
+    while browser.current_url != "https://www.vakantieveilingen.nl/myauctions/#":
         time.sleep(1)
         counter += 1
         log(counter)
