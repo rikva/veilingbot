@@ -1,2 +1,2 @@
-export PATH=$PATH:/home/rik
+export PATH=$PATH:`pwd`
 export DISPLAY=:1

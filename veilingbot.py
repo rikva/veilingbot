@@ -23,7 +23,6 @@ def make_screenshot(browser):
     log('Created screenshot: %s' % filename)
 
 def begin(url):
-    placed_bid = False
     try:
         b = start_browser(url)
         print 'get remaining secs:', get_remaining_secs(b)
@@ -54,22 +53,13 @@ def begin(url):
                     _current_bid = get_current_bid(b)
                     _latest_bidder = get_latest_bidder(b)
 
-#                    max_price = 5
 
                     if _remaining_secs < 6 and _current_bid < max_price:
                         brute_force_bid(b, max_price)
-#                        if not placed_bid:
-#                            log("placing bid!")
-#                            log(_remaining_secs)
-#                            log(_current_bid)
-#                            do_place_bid(b, 3)
-#                            placed_bid = True
-
                     time.sleep(0.5)
 
                 else:
                     time.sleep(5)
-#                    print 'get remaining secs:', get_remaining_secs(b)
                     try:
                         _current_bid = get_current_bid(b)
                         _latest_bidder = get_latest_bidder(b)
@@ -90,11 +80,9 @@ def begin(url):
 
     except Exception as e:
         log("Caught exception: '%s'. Rescheduling restart in 1 minute." % e.message)
-	print e
-	print e.message
-	
+        print e
+        print e.message
         scheduler.enter(60, 1, begin, (url,))
-
 
 
 def start_browser(url):
@@ -158,7 +146,8 @@ def get_current_bid(browser):
                         break
                     break
         except:
-            pass
+            raise
+            #pass
 
 
 def get_latest_bidder(browser):
@@ -172,9 +161,6 @@ def get_latest_bidder(browser):
         return 'unknown'
 
 def save_winning_bid(bid, bidder):
-#    if url not in winning_bids.keys():
-#        winning_bids[url] = dict()
-
     winning_bids[int(time.time())] = {bid: bidder}
 
     pprint.pprint(winning_bids)
@@ -241,8 +227,6 @@ def do_place_bid(browser, price):
         log('DEBUG: Clicking placeBidButton')
         pb.click()
         log('Placed bid for %s EUR' % price)
-        #log('DEBUG: Setting my_bid to ^ price')
-        #my_bid = price
         time.sleep(0.2)
         # Try to close all dialogs:
         log('DEBUG: Closing any dialogs')
