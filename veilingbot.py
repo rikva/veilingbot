@@ -4,17 +4,25 @@ import time
 import pickle
 from selenium import webdriver
 import sys
+from selenium.common.exceptions import ElementNotVisibleException, WebDriverException
 from credentials import USERNAME, PASSWORD
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
 
+# Used for checking win/lost state
+MY_NAME = "H van Achterberg"
+
 def log(msg):
     # to avoid encoding hell:
-    try:
-        print time.ctime() + ' : ' +  str(msg)
-    except:
-        print time.ctime() + ' : Could not decode string!'
+    url = sys.argv[1]
+    with open("veilingbot.log", "a") as logfile:
+        try:
+            logstring =  "%s [%s] : %s" % (time.ctime(), url, str(msg))
+            print logstring
+            logfile.write(logstring+"\n")
+        except:
+            print time.ctime() + ' : Could not decode string!'
 
 
 def make_screenshot(browser):
@@ -55,7 +63,12 @@ def begin(url):
 
 
                     if _remaining_secs < 6 and _current_bid < max_price:
-                        brute_force_bid(b, max_price)
+                        we_won = brute_force_bid(b, max_price)
+                        if we_won:
+                            log("We have won! Exiting!")
+                            b.quit()
+                            sys.exit(0)
+
                     time.sleep(0.5)
 
                 else:
@@ -78,10 +91,20 @@ def begin(url):
         else:
             log('This should not happen.')
 
+    except WebDriverException:
+        log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
+        try:
+            b.quit()
+        except: pass
+        scheduler.enter(15, 1, begin, (url,))
+
     except Exception as e:
-        log("Caught exception: '%s'. Rescheduling restart in 1 minute." % e.message)
-        print e
+        log("Caught exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
+        print type(e)
         print e.message
+        try:
+            b.quit()
+        except: pass
         scheduler.enter(60, 1, begin, (url,))
 
 
@@ -132,9 +155,10 @@ def get_remaining_secs(browser):
             return seconds_left
 
         except Exception as e:
-            log("DEBUG: '%s'" % e.message)
-            log('Returning 11 seconds')
-            return 11
+#            log("DEBUG: '%s'" % e.message)
+#            log('Returning 11 seconds')
+#            return 11
+            raise
 
 def get_current_bid(browser):
     for i in range(10):
@@ -210,7 +234,7 @@ def do_login(browser, return_url=None):
 
 def do_place_bid(browser, price):
     if int(price) > int(max_price):
-        log("Failsafe: not placing bid of %s, it's higher than %s" % (price, max_price))
+        log("FAILSAFE (this should not happen): not placing bid of %s, it's higher than %s" % (price, max_price))
     else:
         log("Placing bid of '%s' euro" % price )
         ub = browser.find_element_by_id('userBid')
@@ -220,12 +244,18 @@ def do_place_bid(browser, price):
         log('DEBUG: Sending %s to input field' % price)
         ub.send_keys(price)
         bm = browser.find_element_by_id('PrototypeLoginTrigger')
+        # The "Bid" button
         log('DEBUG: clicking PrototypeLoginTrigger button')
         bm.click()
         time.sleep(0.2)
-        pb = browser.find_element_by_id('placeBidButton')
-        log('DEBUG: Clicking placeBidButton')
-        pb.click()
+        try:
+            pb = browser.find_element_by_id('placeBidButton')
+            # The "Confirm" button
+            log('DEBUG: Clicking placeBidButton')
+            pb.click()
+        except ElementNotVisibleException:
+            # This can happen when auto-confirm is checked.
+            log("Could not confirm, this is propably OK.")
         log('Placed bid for %s EUR' % price)
         time.sleep(0.2)
         # Try to close all dialogs:
@@ -234,11 +264,20 @@ def do_place_bid(browser, price):
             try:
                 dialog.click()
                 log('Closed a dialog window.')
+            except ElementNotVisibleException:
+                log("Could not close invisible dialog")
             except:
                 log('Failed to close a dialog.')
         make_screenshot(browser)
 
 def brute_force_bid(browser, max_price):
+    """
+    Returns True if we won
+    Returns False if we lost
+
+    Always assumes that we won, we need to CHECK if we may have lost.
+    """
+
     log('Starting brute force bid with a max price of %s' % max_price)
     my_last_bid = 0
 
@@ -252,13 +291,38 @@ def brute_force_bid(browser, max_price):
                 if my_last_bid <= max_price:
                     log("Placing bid of %s" % my_last_bid)
                     do_place_bid(browser, my_last_bid)
+                else:
+                    log("Curent bid is higher than or equal to my max price")
+                    return False
 
         time.sleep(0.1)
 
+    # We assume that we have won! But
+    # Let's check if we have lost
+
+    # Wait a few seconds
+    log("Checking if we lost")
+    time.sleep(3)
+    winning_bidder = get_latest_bidder(browser)
+    last_bid = get_current_bid(browser)
+
+    # Double confirm that we have lost, cause it means that we will begin bidding again.
+    if winning_bidder != MY_NAME and last_bid != my_last_bid:
+        # Too bad, it sure looks like we lost
+        log("Too bad, we lost")
+        return False
+
+    # Wait... we have won!
+    log("It looks like we won!")
+    return True
+
+
+
+
 if __name__ == '__main__':
-    url = sys.argv[1]
+    URL = sys.argv[1]
     max_price = int(sys.argv[2])
-    pickle_filename = url.split('/')[-1] + ".pickle"
+    pickle_filename = URL.split('/')[-1] + ".pickle"
 
     try:
         pickledfile = open( pickle_filename, "rb" )
@@ -268,7 +332,7 @@ if __name__ == '__main__':
         log('No pickle file found')
         winning_bids = dict()
 
-    scheduler.enter(0, 1, begin, (url,))
+    scheduler.enter(0, 1, begin, (URL,))
 
     log('Starting scheduler')
     scheduler.run()
