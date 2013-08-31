@@ -374,7 +374,9 @@ def brute_force_bid(browser, max_price):
 
 
 def go_to_url(browser, url):
+    log("Going to URL %s" % url)
     browser.get(url)
+    log("Opening page succeeded.")
 
     # Hack to close cookie dialog, better for screenshots
     cookie_dialogs = browser.find_elements_by_class_name("acceptCookie")
