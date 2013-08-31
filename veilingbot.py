@@ -331,7 +331,8 @@ def brute_force_bid(browser, max_price):
     winning_bidder = get_latest_bidder(browser)
     last_bid = get_current_bid(browser)
 
-    log("Winning bidder: '%s'" % w)
+    log("Winning bidder: '%s'" % winning_bidder)
+    log("Winning bid: '%s'" % last_bid)
 
     # Double confirm that we have lost, cause it means that we will begin bidding again.
     if winning_bidder != MY_NAME and last_bid != my_last_bid:
