@@ -41,7 +41,7 @@ def make_screenshot(browser):
 def begin(url):
     try:
         b = start_browser(url, browser=USE_BROWSER)
-        print 'get remaining secs:', get_remaining_secs(b)
+        log("Remaining seconds: %s" % get_remaining_secs(b))
 
         if get_remaining_secs(b) is not None and get_remaining_secs(b) > 600:
             wait_secs = get_remaining_secs(b) - 600
@@ -77,7 +77,7 @@ def begin(url):
                     _latest_bidder = get_latest_bidder(b)
 
                     if prev_bid != _current_bid:
-                        log("User '%s' just raised the bid to '%s'." % (_latest_bidder, _current_bid))
+                        log("User '%s' just raised the bid to '%s' on %s seconds left." % (_latest_bidder, _current_bid, _remaining_secs))
 
 
                     if _remaining_secs < 6 and _current_bid < max_price:
