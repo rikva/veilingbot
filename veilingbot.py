@@ -73,6 +73,7 @@ def begin(url):
             else:
                 while get_remaining_secs(b) > 0:
                     sys.stdout.write(".")
+                    sys.stdout.flush()
 
                     global _current_bid
                     global _latest_bidder
