@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+
 import pprint
 import sched
 import time
 import pickle
+import datetime
 from selenium import webdriver
 import sys
 from selenium.common.exceptions import ElementNotVisibleException, WebDriverException
@@ -32,17 +35,21 @@ def make_screenshot(browser):
 
 def begin(url):
     try:
-        b = start_browser(url)
+        b = start_browser(url, browser=USE_BROWSER)
         print 'get remaining secs:', get_remaining_secs(b)
 
         if get_remaining_secs(b) is not None and get_remaining_secs(b) > 600:
             wait_secs = get_remaining_secs(b) - 600
             log("Remaining seconds: More than 600 secs: '%s'. Scheduling a restart in '%s' seconds to check again." % (get_remaining_secs(b), wait_secs))
+            datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
+            log("This would be around %s" % datetime_of_next_action)
             scheduler.enter(wait_secs, 0, begin, (url,))
             b.quit()
 
         elif get_remaining_secs(b) is not None and get_remaining_secs(b) > 200:
             wait_secs = get_remaining_secs(b)-200
+            datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
+            log("This would be around %s" % datetime_of_next_action)
             log("Remaining seconds: More than 200 secs: '%s'. Scheduling a restart in '%s' seconds" % (get_remaining_secs(b), wait_secs))
             scheduler.enter(wait_secs, 0, begin, (url,))
             b.quit()
@@ -108,15 +115,29 @@ def begin(url):
         scheduler.enter(60, 1, begin, (url,))
 
 
-def start_browser(url):
+def start_browser(url, browser="chrome"):
     log("Starting browser")
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options._arguments = ["--user-data-dir=/home/rik/.config/google-chrome/Default/", "--incognito"]
-    browser = webdriver.Chrome(chrome_options=chrome_options)
-#    profile = webdriver.FirefoxProfile()
-#    profile.native_events_enabled = True
-#    browser = webdriver.Firefox(profile)
-#    browser = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNITWITHJS)
+
+    if browser == "chrome":
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options._arguments = ["--user-data-dir=/home/rik/.config/google-chrome/Default/", "--incognito"]
+        browser = webdriver.Chrome(chrome_options=chrome_options)
+
+    elif browser == "firefox":
+        profile = webdriver.FirefoxProfile()
+        profile.native_events_enabled = True
+        browser = webdriver.Firefox(profile)
+
+    elif browser == "phantomjs":
+        browser = webdriver.PhantomJS('./phantomjs-1.9.1-linux-x86_64/bin/phantomjs')
+
+    elif browser == "htmlunit":
+        browser = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNITWITHJS)
+
+    else:
+        log("Unknown browser specified")
+        return
+
     log("Opening url '%s'" % url)
     browser.get(url)
     return browser
@@ -218,7 +239,7 @@ def do_login(browser, return_url=None):
 
     counter = 0
     log('Waiting max. 60 seconds')
-    while browser.current_url != "https://www.vakantieveilingen.nl/myauctions/#":
+    while not browser.current_url.startswith("https://www.vakantieveilingen.nl/myauctions"):
         time.sleep(1)
         counter += 1
         log(counter)
@@ -272,6 +293,10 @@ def do_place_bid(browser, price):
 
 def brute_force_bid(browser, max_price):
     """
+    Try to win the auction with the lowest bid, under max_price.
+    Automatically over-bids other bidders.
+    Always increments the current bid with one.
+
     Returns True if we won
     Returns False if we lost
 
@@ -306,6 +331,8 @@ def brute_force_bid(browser, max_price):
     winning_bidder = get_latest_bidder(browser)
     last_bid = get_current_bid(browser)
 
+    log("Winning bidder: '%s'" % w)
+
     # Double confirm that we have lost, cause it means that we will begin bidding again.
     if winning_bidder != MY_NAME and last_bid != my_last_bid:
         # Too bad, it sure looks like we lost
@@ -322,6 +349,8 @@ def brute_force_bid(browser, max_price):
 if __name__ == '__main__':
     URL = sys.argv[1]
     max_price = int(sys.argv[2])
+    USE_BROWSER = sys.argv[3]
+
     pickle_filename = URL.split('/')[-1] + ".pickle"
 
     try:
