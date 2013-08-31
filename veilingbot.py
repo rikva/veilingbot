@@ -49,8 +49,8 @@ def begin(url):
 #            scheduler.enter(wait_secs, 0, begin, (url,))
 #            b.quit()
 
-        if get_remaining_secs(b) is not None and get_remaining_secs(b) > 120:
-            wait_secs = get_remaining_secs(b)-120
+        if get_remaining_secs(b) is not None and get_remaining_secs(b) > 200:
+            wait_secs = get_remaining_secs(b)-200
             datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
             log("Remaining seconds: More than 120 secs: '%s'. Scheduling a restart in '%s' seconds" % (get_remaining_secs(b), wait_secs))
             log("This would be around %s" % datetime_of_next_action)
@@ -247,8 +247,8 @@ def do_login(browser, return_url=None):
     log('Signing in')
     time.sleep(2)
     go_to_url(browser, "https://www.vakantieveilingen.nl/login.html")
-    log('Waiting 5 secs')
-    time.sleep(5)
+    log('Waiting 2 secs')
+    time.sleep(2)
 
     open_login = browser.find_element_by_class_name('openLogin')
     open_login.click()
@@ -265,12 +265,12 @@ def do_login(browser, return_url=None):
     button.click()
 
     counter = 0
-    log('Waiting max. 60 seconds')
+    log('Waiting max. 30 seconds')
     while not browser.current_url.startswith("https://www.vakantieveilingen.nl/myauctions"):
         time.sleep(1)
         counter += 1
         log(counter)
-        if counter > 60:
+        if counter > 30:
             log('Login failed.')
             return False
     else:
