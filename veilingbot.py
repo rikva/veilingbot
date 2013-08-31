@@ -364,6 +364,8 @@ if __name__ == '__main__':
     URL = sys.argv[1]
     max_price = int(sys.argv[2])
     USE_BROWSER = sys.argv[3]
+    # used for checking if bid has changed
+    _current_bid = None
 
     pickle_filename = URL.split('/')[-1] + ".pickle"
 
