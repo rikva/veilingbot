@@ -112,9 +112,9 @@ def begin(url):
         scheduler.enter(15, 1, begin, (url,))
 
     except Exception as e:
-        log("Caught exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
-        print type(e)
-        print e.message
+        log("Caught unexpected exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
+        log("The exception was: '%s'" % e)
+
         try:
             b.quit()
         except: pass
