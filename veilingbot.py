@@ -59,8 +59,17 @@ def begin(url):
 
         elif get_remaining_secs(b) is not None:
 
-            if not do_login(b, url):
+            # Only login when the current bid is below our max price.
+            if get_current_bid(b) < max_price:
+                log("Current bid is lower than our max price; logging in")
+                login = True
+            else:
+                log("Not logging in; current bid is higher than our max price.")
+                login = False
+
+            if login and not do_login(b, url):
                 scheduler.enter(0, 1, begin, (url,))
+
             else:
                 while get_remaining_secs(b) > 0:
                     global _current_bid
@@ -88,6 +97,7 @@ def begin(url):
                     time.sleep(0.5)
 
                 else:
+                    # The auction seems to be ended
                     time.sleep(5)
                     try:
                         _current_bid = get_current_bid(b)
