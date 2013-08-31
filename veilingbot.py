@@ -165,7 +165,7 @@ def start_browser(url, browser="chrome"):
         return
 
     log("Opening url '%s'" % url)
-    browser.get(url)
+    go_to_url(browser, url)
     return browser
 
 def get_remaining_secs(browser):
@@ -246,7 +246,7 @@ def save_winning_bid(bid, bidder):
 def do_login(browser, return_url=None):
     log('Signing in')
     time.sleep(2)
-    browser.get("https://www.vakantieveilingen.nl/login.html")
+    go_to_url(browser, "https://www.vakantieveilingen.nl/login.html")
     log('Waiting 5 secs')
     time.sleep(5)
 
@@ -277,7 +277,7 @@ def do_login(browser, return_url=None):
         log('Logged in successfully.')
         if return_url:
             log("Returning to url '%s'" % return_url)
-            browser.get(return_url)
+            go_to_url(browser, return_url)
             log("Current bid is: %s" % get_current_bid(browser))
         return True
 
@@ -373,6 +373,20 @@ def brute_force_bid(browser, max_price):
     return True
 
 
+def go_to_url(browser, url):
+    browser.get(url)
+
+    # Hack to close cookie dialog, better for screenshots
+    cookie_dialogs = browser.find_elements_by_class_name("acceptCookie")
+    for dialog in cookie_dialogs:
+        dialog.click()
+
+    # Hack for PhantomJS which doesnt accept cookies with an empty name
+    # and thus raises a dialog window which should be closed
+    if browser.name == 'phantomjs':
+        for dialog in browser.find_elements_by_class_name('DialogClose'):
+            if dialog.is_displayed():
+                dialog.click()
 
 
 if __name__ == '__main__':
