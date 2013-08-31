@@ -164,7 +164,6 @@ def start_browser(url, browser="chrome"):
         log("Unknown browser specified")
         return
 
-    log("Opening url '%s'" % url)
     go_to_url(browser, url)
     return browser
 
