@@ -95,7 +95,9 @@ def begin(url):
                         log("Auction has ended, winning bid is '%s' by '%s'." % (_current_bid, _latest_bidder))
                         save_winning_bid(bid=_current_bid, bidder=_latest_bidder)
                     except Exception as e:
-                        log("Something went wrong: '%s'" % e.message)
+                        log("Something went wrong while determining winning bid")
+                        log(e)
+                        log(type(e))
 
                     b.quit()
                     scheduler.enter(5, 1, begin, (url,))
