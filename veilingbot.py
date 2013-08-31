@@ -98,8 +98,9 @@ def begin(url):
         else:
             log('This should not happen.')
 
-    except WebDriverException:
+    except WebDriverException as e:
         log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
+        log("The exception was: '%s'" % e)
         try:
             b.quit()
         except: pass
