@@ -5,6 +5,7 @@ import sched
 import time
 import pickle
 import datetime
+import os
 from selenium import webdriver
 import sys
 from selenium.common.exceptions import ElementNotVisibleException, WebDriverException
@@ -29,7 +30,11 @@ def log(msg):
 
 
 def make_screenshot(browser):
-    filename = str(time.time()) + '.png'
+    # Ensure directory is created
+    if not os.path.exists("screenshots"):
+        os.makedirs("screenshots")
+
+    filename = os.path.join("screenshots", str(time.time()) + '.png')
     browser.get_screenshot_as_file(filename)
     log('Created screenshot: %s' % filename)
 
