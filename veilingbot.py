@@ -132,7 +132,8 @@ def start_browser(url, browser="chrome"):
 
     if browser == "chrome":
         chrome_options = webdriver.ChromeOptions()
-        chrome_options._arguments = ["--user-data-dir=/home/rik/.config/google-chrome/Default/", "--incognito"]
+#        chrome_options._arguments = ["--user-data-dir=/home/rik/.config/google-chrome/Default/", "--incognito"]
+        chrome_options._arguments = ["--incognito"]
         browser = webdriver.Chrome(chrome_options=chrome_options)
 
     elif browser == "firefox":
