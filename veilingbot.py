@@ -74,7 +74,7 @@ def begin(url):
                     _current_bid = get_current_bid(b)
                     _latest_bidder = get_latest_bidder(b)
 
-                    if prev_bid != _current_bid:
+                    if prev_bid != _current_bid and _current_bid != 0:
                         log("User '%s' just raised the bid to '%s' on %s seconds left." % (_latest_bidder, _current_bid, _remaining_secs))
 
 
