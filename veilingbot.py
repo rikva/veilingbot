@@ -380,6 +380,7 @@ def go_to_url(browser, url):
     cookie_dialogs = browser.find_elements_by_class_name("acceptCookie")
     for dialog in cookie_dialogs:
         dialog.click()
+        log("Closed one cookie law dialog")
 
     # Hack for PhantomJS which doesnt accept cookies with an empty name
     # and thus raises a dialog window which should be closed
@@ -387,6 +388,7 @@ def go_to_url(browser, url):
         for dialog in browser.find_elements_by_class_name('DialogClose'):
             if dialog.is_displayed():
                 dialog.click()
+                log("Closed one cookie warning dialog")
 
 
 if __name__ == '__main__':
