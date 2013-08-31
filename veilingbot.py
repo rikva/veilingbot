@@ -221,7 +221,8 @@ def get_latest_bidder(browser):
 def save_winning_bid(bid, bidder):
     winning_bids[int(time.time())] = {bid: bidder}
 
-    pprint.pprint(winning_bids)
+    history = pprint.pformat(winning_bids)
+    log(history)
 
     pickledfile = open( pickle_filename, "wb" )
     pickle.dump(winning_bids, pickledfile)
