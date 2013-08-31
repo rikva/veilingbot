@@ -41,19 +41,19 @@ def begin(url):
         b = start_browser(url, browser=USE_BROWSER)
         log("Remaining seconds: %s" % get_remaining_secs(b))
 
-        if get_remaining_secs(b) is not None and get_remaining_secs(b) > 600:
-            wait_secs = get_remaining_secs(b) - 600
-            log("Remaining seconds: More than 600 secs: '%s'. Scheduling a restart in '%s' seconds to check again." % (get_remaining_secs(b), wait_secs))
-            datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
-            log("This would be around %s" % datetime_of_next_action)
-            scheduler.enter(wait_secs, 0, begin, (url,))
-            b.quit()
+#        if get_remaining_secs(b) is not None and get_remaining_secs(b) > 600:
+#            wait_secs = get_remaining_secs(b) - 600
+#            log("Remaining seconds: More than 600 secs: '%s'. Scheduling a restart in '%s' seconds to check again." % (get_remaining_secs(b), wait_secs))
+#            datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
+#            log("This would be around %s" % datetime_of_next_action)
+#            scheduler.enter(wait_secs, 0, begin, (url,))
+#            b.quit()
 
-        elif get_remaining_secs(b) is not None and get_remaining_secs(b) > 200:
-            wait_secs = get_remaining_secs(b)-200
+        if get_remaining_secs(b) is not None and get_remaining_secs(b) > 120:
+            wait_secs = get_remaining_secs(b)-120
             datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
+            log("Remaining seconds: More than 120 secs: '%s'. Scheduling a restart in '%s' seconds" % (get_remaining_secs(b), wait_secs))
             log("This would be around %s" % datetime_of_next_action)
-            log("Remaining seconds: More than 200 secs: '%s'. Scheduling a restart in '%s' seconds" % (get_remaining_secs(b), wait_secs))
             scheduler.enter(wait_secs, 0, begin, (url,))
             b.quit()
 
