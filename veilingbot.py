@@ -282,6 +282,12 @@ def do_login(browser, return_url=None):
         return True
 
 def do_place_bid(browser, price):
+    log("ACTION is %s" % ACTION)
+    if ACTION != "bid":
+        log("We are doing a dry run. Not bidding!")
+        make_screenshot(browser)
+        return
+
     if int(price) > int(max_price):
         log("FAILSAFE (this should not happen): not placing bid of %s, it's higher than %s" % (price, max_price))
     else:
@@ -399,6 +405,7 @@ if __name__ == '__main__':
     URL = sys.argv[1]
     max_price = int(sys.argv[2])
     USE_BROWSER = sys.argv[3]
+    ACTION = sys.argv[4]
     # used for checking if bid has changed
     _current_bid = None
 
