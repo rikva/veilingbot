@@ -69,9 +69,15 @@ def begin(url):
                     global _latest_bidder
                     global _remaining_secs
 
+                    # Used to heck if current bid has changed
+                    prev_bid = _current_bid
+
                     _remaining_secs = get_remaining_secs(b)
                     _current_bid = get_current_bid(b)
                     _latest_bidder = get_latest_bidder(b)
+
+                    if prev_bid != _current_bid:
+                        log("User '%s' just raised the bid to '%s'." % (_latest_bidder, _current_bid))
 
 
                     if _remaining_secs < 6 and _current_bid < max_price:
