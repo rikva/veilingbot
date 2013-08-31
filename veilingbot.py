@@ -42,7 +42,7 @@ def begin(url):
         log("Remaining seconds: %s" % get_remaining_secs(b))
 
         if get_remaining_secs(b) is not None and get_remaining_secs(b) > 600:
-            wait_secs = get_remaining_secs(b) - 800
+            wait_secs = get_remaining_secs(b) - 600
             log("Remaining seconds: More than 600 secs: '%s'. Scheduling a restart in '%s' seconds to check again." % (get_remaining_secs(b), wait_secs))
             datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
             log("This would be around %s" % datetime_of_next_action)
