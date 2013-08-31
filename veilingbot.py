@@ -264,6 +264,7 @@ def do_login(browser, return_url=None):
         if return_url:
             log("Returning to url '%s'" % return_url)
             browser.get(return_url)
+            log("Current bid is: %s" % get_current_bid(browser))
         return True
 
 def do_place_bid(browser, price):
