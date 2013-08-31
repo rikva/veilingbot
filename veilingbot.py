@@ -9,13 +9,11 @@ import os
 from selenium import webdriver
 import sys
 from selenium.common.exceptions import ElementNotVisibleException, WebDriverException
-from credentials import USERNAME, PASSWORD
+from credentials import USERNAME, PASSWORD, MY_NAME
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
 
-# Used for checking win/lost state
-MY_NAME = "H van Achterberg"
 
 def log(msg):
     # to avoid encoding hell:
