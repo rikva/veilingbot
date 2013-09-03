@@ -19,7 +19,7 @@ scheduler = sched.scheduler(time.time, time.sleep)
 def log(msg):
     # to avoid encoding hell:
     url = sys.argv[1]
-    with open("veilingbot.log", "a") as logfile:
+    with open("ticketveiling.log", "a") as logfile:
         try:
             logstring =  "%s [%s] : %s" % (time.ctime(), url, str(msg))
             print logstring
