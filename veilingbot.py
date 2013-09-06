@@ -45,10 +45,12 @@ def begin(url):
 
             # Only login when the current bid is below our max price.
             if SITE.get_current_bid() < max_price:
-                log("Current bid is lower than our max price; logging in")
+                log("Current bid (%s) is lower than our max price (%s); logging in"
+                    % (_current_bid, max_price))
                 login = True
             else:
-                log("Not logging in; current bid is higher than our max price.")
+                log("Not logging in; current bid (%s) is higher than our max price (%s)."
+                    %(_current_bid, max_price))
                 login = False
 
             if login and not SITE.do_login():
