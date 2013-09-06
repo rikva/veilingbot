@@ -80,14 +80,17 @@ class VakantieVeilingen():
         except:
             return 'unknown'
 
+    def _is_logged_in(self):
+        if self.browser.find_elements_by_link_text("Uitloggen"):
+            return True
+        return False
 
     def do_login(self, return_url=None):
-        log('Signing in')
-        time.sleep(2)
-        go_to_url(self.browser, "https://www.vakantieveilingen.nl/login.html")
-        log('Waiting 2 secs')
-        time.sleep(2)
+        if self._is_logged_in():
+            log ("Already signed in")
+            return True
 
+        log('Signing in')
         open_login = self.browser.find_element_by_class_name('openLogin')
         open_login.click()
 
@@ -104,7 +107,7 @@ class VakantieVeilingen():
 
         counter = 0
         log('Waiting max. 30 seconds')
-        while not self.browser.current_url.startswith("https://www.vakantieveilingen.nl/myauctions"):
+        while not self._is_logged_in():
             time.sleep(1)
             counter += 1
             log(counter)
