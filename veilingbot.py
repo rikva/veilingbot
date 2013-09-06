@@ -63,7 +63,7 @@ def begin(url):
                         log("User '%s' just raised the bid to '%s' on %s seconds left." % (_latest_bidder, _current_bid, _remaining_secs))
 
                     if _remaining_secs < 6 and _current_bid < max_price:
-                        we_won = brute_force_bid(browser, max_price)
+                        we_won = brute_force_bid(SITE, max_price)
                         if we_won:
                             log("Exiting!")
                             browser.quit()
