@@ -20,27 +20,27 @@ class VakantieVeilingen():
             try:
                 counter_span = self.browser.find_element_by_class_name('counter-running')
                 celement = counter_span.find_element_by_tag_name('span')
-                timestring = celement.text.split()
+                splitted_timestring = celement.text.split()
 
-                if timestring[0] == 'Gesloten' or timestring[0] == '':
+                if splitted_timestring == [] or splitted_timestring[0] == 'Gesloten' or splitted_timestring[0] == '':
                     log('Auction has ended.')
 
                     make_screenshot(self.browser)
 
                     return 0
 
-                if len(timestring) == 6:
+                if len(splitted_timestring) == 6:
                     # includes hour
-                    remaining_hours = int(timestring[0])
-                elif len(timestring) == 4:
+                    remaining_hours = int(splitted_timestring[0])
+                elif len(splitted_timestring) == 4:
                     # excludes hour
                     remaining_hours = 0
                 else:
                     # something is wrong
-                    log("DEBUG: Could not parse timestring '%s', auction is probably ending." % timestring)
+                    log("DEBUG: Could not parse splitted_timestring '%s', auction is probably ending." % splitted_timestring)
 
-                remaining_mins = int(timestring[-4])
-                remaining_secs = int(timestring[-2])
+                remaining_mins = int(splitted_timestring[-4])
+                remaining_secs = int(splitted_timestring[-2])
                 seconds_left = remaining_secs
                 seconds_left += (remaining_mins * 60)
                 seconds_left += ((remaining_hours * 60) * 60)
