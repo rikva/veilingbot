@@ -145,10 +145,10 @@ def brute_force_bid(site, max_price):
     while site.get_remaining_secs() > 0:
         __current_bid_last_time = _current_bid
         _current_bid = site.get_current_bid()
-        _latest_bidder = site.get_latest_bidder()
-        _remaining_secs = site.get_remaining_secs()
 
         if _current_bid != __current_bid_last_time:
+            _latest_bidder = site.get_latest_bidder()
+            _remaining_secs = site.get_remaining_secs()
             log("User '%s' just raised the bid to '%s' on %s seconds left."
                 % (_latest_bidder, _current_bid, _remaining_secs))
 

@@ -2,7 +2,7 @@ import traceback
 import time
 from selenium.common.exceptions import ElementNotVisibleException
 from credentials import USERNAME, PASSWORD
-from veilingbotcore import log, make_screenshot, go_to_url
+from veilingbotcore import log, make_screenshot
 
 
 class VakantieVeilingen():
