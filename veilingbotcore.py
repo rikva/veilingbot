@@ -7,9 +7,10 @@ from selenium import webdriver
 def log(msg):
     # to avoid encoding hell:
     url = sys.argv[1]
+    last_url_part = url.split("/")[-1]
     with open("veilingbot.log", "a") as logfile:
         try:
-            logstring =  "%s [%s] : %s" % (time.ctime(), url, str(msg))
+            logstring =  "%s [%s] : %s" % (time.ctime(), last_url_part, str(msg))
             print logstring
             logfile.write(logstring+"\n")
         except:
