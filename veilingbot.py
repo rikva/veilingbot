@@ -174,7 +174,7 @@ def brute_force_bid(site, max_price):
         return False
 
     # Wait... we have won!
-    log("It looks like we won!")
+    log("I's possible that we've won.")
     return True
 
 
