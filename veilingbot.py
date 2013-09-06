@@ -74,6 +74,7 @@ def begin(url):
                     _latest_bidder = SITE.get_latest_bidder()
 
                     if prev_bid != _current_bid and _current_bid != 0 and prev_bid is not None:
+                        sys.stdout.write("\n")
                         sys.stdout.flush()
                         log("User '%s' just raised the bid to '%s' on %s seconds left." % (_latest_bidder, _current_bid, _remaining_secs))
 
