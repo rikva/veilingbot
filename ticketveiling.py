@@ -20,7 +20,7 @@ class TicketVeiling():
             counter = countdownbox.text
             splitted_remaining_time = counter.split()
 
-            if not splitted_remaining_time:
+            if not splitted_remaining_time or splitted_remaining_time == [u'Gesloten']:
                 log('Auction has ended.')
                 make_screenshot(self.browser)
                 return 0
