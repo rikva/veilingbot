@@ -85,7 +85,7 @@ class VakantieVeilingen():
             return True
         return False
 
-    def do_login(self, return_url=None):
+    def do_login(self):
         if self._is_logged_in():
             log ("Already signed in")
             return True
@@ -117,10 +117,6 @@ class VakantieVeilingen():
                 return False
         else:
             log('Logged in successfully.')
-            if return_url:
-                log("Returning to url '%s'" % return_url)
-                go_to_url(self.browser, return_url)
-                log("Current bid is: %s" % self.get_current_bid())
             return True
 
     def do_place_bid(self, price):

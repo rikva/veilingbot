@@ -41,7 +41,7 @@ def begin(url):
                 log("Not logging in; current bid is higher than our max price.")
                 login = False
 
-            if login and not SITE.do_login(url):
+            if login and not SITE.do_login():
                 scheduler.enter(0, 1, begin, (url,))
 
             else:
