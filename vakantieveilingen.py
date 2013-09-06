@@ -107,12 +107,12 @@ class VakantieVeilingen():
         button.click()
 
         counter = 0
-        log('Waiting max. 30 seconds')
+        log('Waiting max. 15 seconds')
         while not self._is_logged_in():
             time.sleep(1)
             counter += 1
             log(counter)
-            if counter > 30:
+            if counter > 15:
                 log('Login failed.')
                 return False
         else:
