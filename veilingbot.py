@@ -18,8 +18,10 @@ scheduler = sched.scheduler(time.time, time.sleep)
 def begin(url):
     try:
         if "vakantieveilingen.nl" in url:
+            log("Using VakantieVeilingen engine")
             Site = VakantieVeilingen
         elif "ticketveiling.nl" in url:
+            log("Using TicketVeiling engine")
             Site = TicketVeiling
         else:
             print "Cannot detect URL"
