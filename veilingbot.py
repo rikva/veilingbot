@@ -5,74 +5,46 @@ import sched
 import time
 import pickle
 import datetime
-import traceback
-import os
-from selenium import webdriver
 import sys
-from selenium.common.exceptions import ElementNotVisibleException, WebDriverException
-from credentials import USERNAME, PASSWORD, MY_NAME
+from selenium.common.exceptions import  WebDriverException
+from credentials import MY_NAME
+from vakantieveilingen import VakantieVeilingen
+from veilingbotcore import log, start_browser
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
 
-
-def log(msg):
-    # to avoid encoding hell:
-    url = sys.argv[1]
-    with open("veilingbot.log", "a") as logfile:
-        try:
-            logstring =  "%s [%s] : %s" % (time.ctime(), url, str(msg))
-            print logstring
-            logfile.write(logstring+"\n")
-        except:
-            print time.ctime() + ' : Could not decode string!'
-
-
-def make_screenshot(browser):
-    # Ensure directory is created
-    if not os.path.exists("screenshots"):
-        os.makedirs("screenshots")
-
-    filename = os.path.join("screenshots", str(time.time()) + '.png')
-    browser.get_screenshot_as_file(filename)
-    log('Created screenshot: %s' % filename)
-
 def begin(url):
     try:
-        b = start_browser(url, browser=USE_BROWSER)
-        log("Remaining seconds: %s" % get_remaining_secs(b))
+        browser = start_browser(url, browser=USE_BROWSER)
+        SITE = VakantieVeilingen(browser=browser, max_price=max_price, action=ACTION)
 
-#        if get_remaining_secs(b) is not None and get_remaining_secs(b) > 600:
-#            wait_secs = get_remaining_secs(b) - 600
-#            log("Remaining seconds: More than 600 secs: '%s'. Scheduling a restart in '%s' seconds to check again." % (get_remaining_secs(b), wait_secs))
-#            datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
-#            log("This would be around %s" % datetime_of_next_action)
-#            scheduler.enter(wait_secs, 0, begin, (url,))
-#            b.quit()
+        log("Remaining seconds: %s" % SITE.get_remaining_secs())
 
-        if get_remaining_secs(b) is not None and get_remaining_secs(b) > 200:
-            wait_secs = get_remaining_secs(b)-200
+        if SITE.get_remaining_secs() is not None and SITE.get_remaining_secs() > 200:
+            wait_secs = SITE.get_remaining_secs()-200
             datetime_of_next_action = datetime.datetime.now() + datetime.timedelta(seconds=wait_secs)
-            log("Remaining seconds: More than 120 secs: '%s'. Scheduling a restart in '%s' seconds" % (get_remaining_secs(b), wait_secs))
+            log("Remaining seconds: More than 120 secs: '%s'. Scheduling a restart in '%s' seconds" %
+                (SITE.get_remaining_secs(), wait_secs))
             log("This would be around %s" % datetime_of_next_action)
             scheduler.enter(wait_secs, 0, begin, (url,))
-            b.quit()
+            browser.quit()
 
-        elif get_remaining_secs(b) is not None:
+        elif SITE.get_remaining_secs() is not None:
 
             # Only login when the current bid is below our max price.
-            if get_current_bid(b) < max_price:
+            if SITE.get_current_bid() < max_price:
                 log("Current bid is lower than our max price; logging in")
                 login = True
             else:
                 log("Not logging in; current bid is higher than our max price.")
                 login = False
 
-            if login and not do_login(b, url):
+            if login and not SITE.do_login(url):
                 scheduler.enter(0, 1, begin, (url,))
 
             else:
-                while get_remaining_secs(b) > 0:
+                while SITE.get_remaining_secs() > 0:
                     sys.stdout.write(".")
                     sys.stdout.flush()
 
@@ -83,19 +55,18 @@ def begin(url):
                     # Used to heck if current bid has changed
                     prev_bid = _current_bid
 
-                    _remaining_secs = get_remaining_secs(b)
-                    _current_bid = get_current_bid(b)
-                    _latest_bidder = get_latest_bidder(b)
+                    _remaining_secs = SITE.get_remaining_secs()
+                    _current_bid = SITE.get_current_bid()
+                    _latest_bidder = SITE.get_latest_bidder()
 
                     if prev_bid != _current_bid and _current_bid != 0 and prev_bid is not None:
                         log("User '%s' just raised the bid to '%s' on %s seconds left." % (_latest_bidder, _current_bid, _remaining_secs))
 
-
                     if _remaining_secs < 6 and _current_bid < max_price:
-                        we_won = brute_force_bid(b, max_price)
+                        we_won = brute_force_bid(browser, max_price)
                         if we_won:
                             log("Exiting!")
-                            b.quit()
+                            browser.quit()
                             sys.exit(0)
 
                     time.sleep(0.5)
@@ -104,8 +75,8 @@ def begin(url):
                     # The auction seems to be ended
                     time.sleep(5)
                     try:
-                        _current_bid = get_current_bid(b)
-                        _latest_bidder = get_latest_bidder(b)
+                        _current_bid = SITE.get_current_bid()
+                        _latest_bidder = SITE.get_latest_bidder()
                         log("Auction has ended, winning bid is '%s' by '%s'." % (_current_bid, _latest_bidder))
                         save_winning_bid(bid=_current_bid, bidder=_latest_bidder)
                     except Exception as e:
@@ -113,10 +84,10 @@ def begin(url):
                         log(e)
                         log(type(e))
 
-                    b.quit()
+                    browser.quit()
                     scheduler.enter(5, 1, begin, (url,))
 
-        elif get_remaining_secs(b) is None:
+        elif SITE.get_remaining_secs() is None:
             log('Auction seems to be closed. Scheduling restart in 60 secs.')
             scheduler.enter(60, 1, begin, (url,))
 
@@ -127,7 +98,7 @@ def begin(url):
         log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
         log("The exception was: '%s'" % e)
         try:
-            b.quit()
+            SITE.browser.quit()
         except: pass
         scheduler.enter(15, 1, begin, (url,))
 
@@ -136,103 +107,9 @@ def begin(url):
         log("The exception was: '%s'" % e)
 
         try:
-            b.quit()
+            SITE.browser.quit()
         except: pass
         scheduler.enter(60, 1, begin, (url,))
-
-
-def start_browser(url, browser="chrome"):
-    log("Starting browser")
-
-    if browser == "chrome":
-        chrome_options = webdriver.ChromeOptions()
-#        chrome_options._arguments = ["--user-data-dir=/home/rik/.config/google-chrome/Default/", "--incognito"]
-        chrome_options._arguments = ["--incognito"]
-        browser = webdriver.Chrome(chrome_options=chrome_options)
-
-    elif browser == "firefox":
-        profile = webdriver.FirefoxProfile()
-        profile.native_events_enabled = True
-        browser = webdriver.Firefox(profile)
-
-    elif browser == "phantomjs":
-        browser = webdriver.PhantomJS('./phantomjs-1.9.1-linux-x86_64/bin/phantomjs')
-
-    elif browser == "htmlunit":
-        browser = webdriver.Remote("http://localhost:4444/wd/hub", webdriver.DesiredCapabilities.HTMLUNITWITHJS)
-
-    else:
-        log("Unknown browser specified")
-        return
-
-    go_to_url(browser, url)
-    return browser
-
-def get_remaining_secs(browser):
-    seconds_left = ''
-    while not seconds_left.isdigit():
-        try:
-            counter_span = browser.find_element_by_class_name('counter-running')
-            celement = counter_span.find_element_by_tag_name('span')
-            timestring = celement.text.split()
-
-            if timestring[0] == 'Gesloten' or timestring[0] == '':
-                log('Auction has ended.')
-
-                make_screenshot(browser)
-
-                return 0
-
-            if len(timestring) == 6:
-                # includes hour
-                remaining_hours = int(timestring[0])
-            elif len(timestring) == 4:
-                # excludes hour
-                remaining_hours = 0
-            else:
-                # something is wrong
-                log("DEBUG: Could not parse timestring '%s', auction is probably ending." % timestring)
-
-            remaining_mins = int(timestring[-4])
-            remaining_secs = int(timestring[-2])
-            seconds_left = remaining_secs
-            seconds_left += (remaining_mins * 60)
-            seconds_left += ((remaining_hours * 60) * 60)
-            seconds_left = int(seconds_left)
-            return seconds_left
-
-        except Exception as e:
-
-            log("EXCEPTION ! DEBUG: '%s'" % e)
-            log('Returning 11 seconds')
-            traceback.print_exc()
-            return 11
-
-#            raise
-
-def get_current_bid(browser):
-    for i in range(10):
-        try:
-            for price in browser.find_elements_by_class_name('price'):
-                if price.text:
-                    if len(price.text.split()) == 2:
-                        return int(price.text.split()[1])
-                    log("Woah wait this should not happen")
-                    break
-        except Exception as e:
-            log("DEBUG: Could not obtain price. Exception: %s.Printing traceback." % e)
-            traceback.print_exc()
-
-
-def get_latest_bidder(browser):
-    try:
-        bh = browser.find_element_by_id('biddinghistory')
-        li = bh.find_element_by_tag_name('li')
-        p = li.find_element_by_tag_name('p')
-        st = p.find_element_by_tag_name('strong')
-        return st.text
-    except:
-        return 'unknown'
 
 def save_winning_bid(bid, bidder):
     winning_bids[int(time.time())] = {bid: bidder}
@@ -246,89 +123,7 @@ def save_winning_bid(bid, bidder):
 
 
 
-def do_login(browser, return_url=None):
-    log('Signing in')
-    time.sleep(2)
-    go_to_url(browser, "https://www.vakantieveilingen.nl/login.html")
-    log('Waiting 2 secs')
-    time.sleep(2)
-
-    open_login = browser.find_element_by_class_name('openLogin')
-    open_login.click()
-
-    email = browser.find_element_by_id('loginEmailField')
-    passwd = browser.find_element_by_id('loginPasswordField')
-
-    form = browser.find_element_by_id('LoginForm')
-    fieldset = form.find_element_by_tag_name('fieldset')
-    button = fieldset.find_elements_by_tag_name('input')[-1]
-
-    email.send_keys(USERNAME)
-    passwd.send_keys(PASSWORD)
-    button.click()
-
-    counter = 0
-    log('Waiting max. 30 seconds')
-    while not browser.current_url.startswith("https://www.vakantieveilingen.nl/myauctions"):
-        time.sleep(1)
-        counter += 1
-        log(counter)
-        if counter > 30:
-            log('Login failed.')
-            return False
-    else:
-        log('Logged in successfully.')
-        if return_url:
-            log("Returning to url '%s'" % return_url)
-            go_to_url(browser, return_url)
-            log("Current bid is: %s" % get_current_bid(browser))
-        return True
-
-def do_place_bid(browser, price):
-    log("ACTION is %s" % ACTION)
-    if ACTION != "bid":
-        log("We are doing a dry run. Not bidding!")
-        make_screenshot(browser)
-        return
-
-    if int(price) > int(max_price):
-        log("FAILSAFE (this should not happen): not placing bid of %s, it's higher than %s" % (price, max_price))
-    else:
-        log("Placing bid of '%s' euro" % price )
-        ub = browser.find_element_by_id('userBid')
-        # first clear the input field!
-        log('DEBUG: Clearing input field')
-        ub.clear()
-        log('DEBUG: Sending %s to input field' % price)
-        ub.send_keys(price)
-        bm = browser.find_element_by_id('PrototypeLoginTrigger')
-        # The "Bid" button
-        log('DEBUG: clicking PrototypeLoginTrigger button')
-        bm.click()
-        time.sleep(0.2)
-        try:
-            pb = browser.find_element_by_id('placeBidButton')
-            # The "Confirm" button
-            log('DEBUG: Clicking placeBidButton')
-            pb.click()
-        except ElementNotVisibleException:
-            # This can happen when auto-confirm is checked.
-            log("Could not confirm, this is propably OK.")
-        log('Placed bid for %s EUR' % price)
-        time.sleep(0.2)
-        # Try to close all dialogs:
-        log('DEBUG: Closing any dialogs')
-        for dialog in browser.find_elements_by_class_name('DialogClose'):
-            try:
-                dialog.click()
-                log('Closed a dialog window.')
-            except ElementNotVisibleException:
-                log("Could not close invisible dialog")
-            except:
-                log('Failed to close a dialog.')
-#        make_screenshot(browser)
-
-def brute_force_bid(browser, max_price):
+def brute_force_bid(site, max_price):
     """
     Try to win the auction with the lowest bid, under max_price.
     Automatically over-bids other bidders.
@@ -343,14 +138,14 @@ def brute_force_bid(browser, max_price):
     log('Starting brute force bid with a max price of %s' % max_price)
     my_last_bid = 0
 
-    while get_remaining_secs(browser) > 0:
-        _current_bid = get_current_bid(browser)
+    while site.get_remaining_secs() > 0:
+        _current_bid = site.get_current_bid()
 
         if _current_bid > my_last_bid and _current_bid < max_price:
                 my_last_bid = _current_bid+1
                 if my_last_bid <= max_price:
                     log("Placing bid of %s" % my_last_bid)
-                    do_place_bid(browser, my_last_bid)
+                    site.do_place_bid(my_last_bid)
                 else:
                     log("Curent bid is higher than or equal to my max price")
                     return False
@@ -363,8 +158,8 @@ def brute_force_bid(browser, max_price):
     # Wait a few seconds
     log("Checking if we lost")
     time.sleep(3)
-    winning_bidder = get_latest_bidder(browser)
-    last_bid = get_current_bid(browser)
+    winning_bidder = site.get_latest_bidder()
+    last_bid = site.get_current_bid()
 
     log("Winning bidder: '%s'" % winning_bidder)
     log("Winning bid: '%s'" % last_bid)
@@ -378,28 +173,6 @@ def brute_force_bid(browser, max_price):
     # Wait... we have won!
     log("It looks like we won!")
     return True
-
-
-def go_to_url(browser, url):
-    log("Going to URL %s" % url)
-    start_datetime = datetime.datetime.now()
-    browser.get(url)
-    elapsed_secs = datetime.datetime.now() - start_datetime
-    log("Opening page succeeded in %s seconds." % elapsed_secs.seconds)
-
-    # Hack to close cookie dialog, better for screenshots
-    cookie_dialogs = browser.find_elements_by_class_name("acceptCookie")
-    for dialog in cookie_dialogs:
-        dialog.click()
-        log("Closed one cookie law dialog")
-
-    # Hack for PhantomJS which doesnt accept cookies with an empty name
-    # and thus raises a dialog window which should be closed
-    if browser.name == 'phantomjs':
-        for dialog in browser.find_elements_by_class_name('DialogClose'):
-            if dialog.is_displayed():
-                dialog.click()
-                log("Closed one cookie warning dialog")
 
 
 if __name__ == '__main__':
