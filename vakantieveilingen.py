@@ -93,6 +93,7 @@ class VakantieVeilingen():
         log('Signing in')
         open_login = self.browser.find_element_by_class_name('openLogin')
         open_login.click()
+        time.sleep(1)
 
         email = self.browser.find_element_by_id('loginEmailField')
         passwd = self.browser.find_element_by_id('loginPasswordField')
