@@ -32,7 +32,9 @@ def go_to_url(browser, url):
     browser.get(url)
     elapsed_secs = datetime.datetime.now() - start_datetime
     log("Opening page succeeded in %s seconds." % elapsed_secs.seconds)
+    close_cookie_dialogs(browser)
 
+def close_cookie_dialogs(browser):
     # Hack to close cookie dialog, better for screenshots
     cookie_dialogs = browser.find_elements_by_class_name("acceptCookie")
     for dialog in cookie_dialogs:

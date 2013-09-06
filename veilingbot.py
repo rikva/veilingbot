@@ -10,7 +10,7 @@ import traceback
 from selenium.common.exceptions import  WebDriverException
 from credentials import MY_NAME
 from vakantieveilingen import VakantieVeilingen
-from veilingbotcore import log, start_browser
+from veilingbotcore import log, start_browser, close_cookie_dialogs
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
@@ -45,6 +45,9 @@ def begin(url):
                 scheduler.enter(0, 1, begin, (url,))
 
             else:
+                # Close cookie dialog that might have re-appeared after signing in
+                close_cookie_dialogs(browser)
+
                 while SITE.get_remaining_secs() > 0:
                     sys.stdout.write(".")
                     sys.stdout.flush()
