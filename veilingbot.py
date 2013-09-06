@@ -6,6 +6,7 @@ import time
 import pickle
 import datetime
 import sys
+import traceback
 from selenium.common.exceptions import  WebDriverException
 from credentials import MY_NAME
 from vakantieveilingen import VakantieVeilingen
@@ -97,6 +98,7 @@ def begin(url):
     except WebDriverException as e:
         log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
         log("The exception was: '%s'" % e)
+        traceback.print_exc()
         try:
             SITE.browser.quit()
         except: pass
@@ -105,6 +107,7 @@ def begin(url):
     except Exception as e:
         log("Caught unexpected exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
         log("The exception was: '%s'" % e)
+        traceback.print_exc()
 
         try:
             SITE.browser.quit()
