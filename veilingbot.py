@@ -5,6 +5,7 @@ import sched
 import time
 import pickle
 import datetime
+import traceback
 import os
 from selenium import webdriver
 import sys
@@ -201,10 +202,13 @@ def get_remaining_secs(browser):
             return seconds_left
 
         except Exception as e:
-#            log("DEBUG: '%s'" % e.message)
-#            log('Returning 11 seconds')
-#            return 11
-            raise
+
+            log("EXCEPTION ! DEBUG: '%s'" % e)
+            log('Returning 11 seconds')
+            traceback.print_exc()
+            return 11
+
+#            raise
 
 def get_current_bid(browser):
     for i in range(10):
@@ -213,11 +217,11 @@ def get_current_bid(browser):
                 if price.text:
                     if len(price.text.split()) == 2:
                         return int(price.text.split()[1])
-                        break
+                    log("Woah wait this should not happen")
                     break
-        except:
-            raise
-            #pass
+        except Exception as e:
+            log("DEBUG: Could not obtain price. Exception: %s.Printing traceback." % e)
+            traceback.print_exc()
 
 
 def get_latest_bidder(browser):
@@ -322,7 +326,7 @@ def do_place_bid(browser, price):
                 log("Could not close invisible dialog")
             except:
                 log('Failed to close a dialog.')
-        make_screenshot(browser)
+#        make_screenshot(browser)
 
 def brute_force_bid(browser, max_price):
     """
@@ -340,9 +344,7 @@ def brute_force_bid(browser, max_price):
     my_last_bid = 0
 
     while get_remaining_secs(browser) > 0:
-        _remaining_secs = get_remaining_secs(browser)
         _current_bid = get_current_bid(browser)
-        _latest_bidder = get_latest_bidder(browser)
 
         if _current_bid > my_last_bid and _current_bid < max_price:
                 my_last_bid = _current_bid+1
