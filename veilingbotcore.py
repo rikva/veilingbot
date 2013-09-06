@@ -35,20 +35,22 @@ def go_to_url(browser, url):
     close_cookie_dialogs(browser)
 
 def close_cookie_dialogs(browser):
-    # Hack to close cookie dialog, better for screenshots
-    cookie_dialogs = browser.find_elements_by_class_name("acceptCookie")
-    for dialog in cookie_dialogs:
-        dialog.click()
-        log("Closed one cookie law dialog")
+    try:
+        # Hack to close cookie dialog, better for screenshots
+        cookie_dialogs = browser.find_elements_by_class_name("acceptCookie")
+        for dialog in cookie_dialogs:
+            dialog.click()
+            log("Closed one cookie law dialog")
 
-    # Hack for PhantomJS which doesnt accept cookies with an empty name
-    # and thus raises a dialog window which should be closed
-    if browser.name == 'phantomjs':
-        for dialog in browser.find_elements_by_class_name('DialogClose'):
-            if dialog.is_displayed():
-                dialog.click()
-                log("Closed one cookie warning dialog")
-
+        # Hack for PhantomJS which doesnt accept cookies with an empty name
+        # and thus raises a dialog window which should be closed
+        if browser.name == 'phantomjs':
+            for dialog in browser.find_elements_by_class_name('DialogClose'):
+                if dialog.is_displayed():
+                    dialog.click()
+                    log("Closed one cookie warning dialog")
+    except:
+        pass
 
 def start_browser(url, browser="chrome"):
     log("Starting browser")
