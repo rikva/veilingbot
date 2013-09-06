@@ -123,7 +123,6 @@ class VakantieVeilingen():
         log("ACTION is %s" % self.action)
         if self.action != "bid":
             log("We are doing a dry run. Not bidding!")
-            make_screenshot(self.browser)
             return
 
         if int(price) > int(self.max_price):
