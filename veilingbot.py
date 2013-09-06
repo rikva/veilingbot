@@ -66,7 +66,7 @@ def begin(url):
                     global _latest_bidder
                     global _remaining_secs
 
-                    # Used to heck if current bid has changed
+                    # Used to check if current bid has changed
                     prev_bid = _current_bid
 
                     _remaining_secs = SITE.get_remaining_secs()
@@ -76,7 +76,8 @@ def begin(url):
                     if prev_bid != _current_bid and _current_bid != 0 and prev_bid is not None:
                         sys.stdout.write("\n")
                         sys.stdout.flush()
-                        log("User '%s' just raised the bid to '%s' on %s seconds left." % (_latest_bidder, _current_bid, _remaining_secs))
+                        log("User '%s' just raised the bid to '%s' on %s seconds left."
+                            % (_latest_bidder, _current_bid, _remaining_secs))
 
                     if _remaining_secs < 6 and _current_bid < max_price:
                         we_won = brute_force_bid(SITE, max_price)
@@ -90,15 +91,10 @@ def begin(url):
                 else:
                     # The auction seems to be ended
                     time.sleep(5)
-                    try:
-                        _current_bid = SITE.get_current_bid()
-                        _latest_bidder = SITE.get_latest_bidder()
-                        log("Auction has ended, winning bid is '%s' by '%s'." % (_current_bid, _latest_bidder))
-                        save_winning_bid(bid=_current_bid, bidder=_latest_bidder)
-                    except Exception as e:
-                        log("Something went wrong while determining winning bid")
-                        log(e)
-                        log(type(e))
+                    _current_bid = SITE.get_current_bid()
+                    _latest_bidder = SITE.get_latest_bidder()
+                    log("Auction has ended, winning bid is '%s' by '%s'." % (_current_bid, _latest_bidder))
+                    save_winning_bid(bid=_current_bid, bidder=_latest_bidder)
 
                     browser.quit()
                     scheduler.enter(5, 1, begin, (url,))
