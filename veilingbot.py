@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import pprint
 import sched
 import time
@@ -9,6 +8,7 @@ import sys
 import traceback
 from selenium.common.exceptions import  WebDriverException
 from credentials import MY_NAME
+from ticketveiling import TicketVeiling
 from vakantieveilingen import VakantieVeilingen
 from veilingbotcore import log, start_browser, close_cookie_dialogs
 
@@ -17,8 +17,16 @@ scheduler = sched.scheduler(time.time, time.sleep)
 
 def begin(url):
     try:
+        if "vakantieveilingen.nl" in url:
+            Site = VakantieVeilingen
+        elif "ticketveiling.nl" in url:
+            Site = TicketVeiling
+        else:
+            print "Cannot detect URL"
+            sys.exit(1)
+
         browser = start_browser(url, browser=USE_BROWSER)
-        SITE = VakantieVeilingen(browser=browser, max_price=max_price, action=ACTION)
+        SITE = Site(browser=browser, max_price=max_price, action=ACTION)
 
         log("Remaining seconds: %s" % SITE.get_remaining_secs())
 
