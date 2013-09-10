@@ -154,6 +154,7 @@ class VakantieVeilingen():
             # Try to close all dialogs:
             log('DEBUG: Closing any dialogs')
             for dialog in self.browser.find_elements_by_class_name('DialogClose'):
+                log("Encountered dialog with text: '%s'" % dialog.text)
                 try:
                     dialog.click()
                     log('Closed a dialog window.')
