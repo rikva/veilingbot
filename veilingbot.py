@@ -6,6 +6,7 @@ import pickle
 import datetime
 import sys
 import traceback
+import sqlite3
 from selenium.common.exceptions import  WebDriverException
 from credentials import MY_NAME
 from ticketveiling import TicketVeiling
@@ -80,6 +81,10 @@ def begin(url):
                         sys.stdout.flush()
                         log("User '%s' just raised the bid to '%s' on %s seconds left."
                             % (_latest_bidder, _current_bid, _remaining_secs))
+                        timestring = int(time.time())
+                        CURSOR.execute("insert into bid values (%s, %s, '%s', %s, 0);"
+                                       % (AUCTION_ID, timestring, _latest_bidder, _current_bid))
+                        DBCONN.commit()
 
                     if _remaining_secs < 6 and _current_bid < max_price:
                         we_won = brute_force_bid(SITE, max_price)
@@ -96,7 +101,7 @@ def begin(url):
                     _current_bid = SITE.get_current_bid()
                     _latest_bidder = SITE.get_latest_bidder()
                     log("Auction has ended, winning bid is '%s' by '%s'." % (_current_bid, _latest_bidder))
-                    save_winning_bid(bid=_current_bid, bidder=_latest_bidder)
+                    save_winning_bid_and_log_history(bid=_current_bid, bidder=_latest_bidder)
 
                     browser.quit()
                     scheduler.enter(5, 1, begin, (url,))
@@ -127,17 +132,24 @@ def begin(url):
         except: pass
         scheduler.enter(60, 1, begin, (url,))
 
-def save_winning_bid(bid, bidder):
-    winning_bids[int(time.time())] = {bid: bidder}
+def _get_winning_bids(auction_id):
+    CURSOR.execute("select datetime, name, amount from bid where auction = %s and winning = 1;" % auction_id)
+    result = CURSOR.fetchall()
+    winning_bids = {}
+    for r in result:
+        winning_bids[r[0]] = {r[1]: r[2]}
+
+    return winning_bids
+
+def save_winning_bid_and_log_history(bid, bidder):
+    CURSOR.execute("UPDATE bid SET winning=1 WHERE auction=%s and name='%s' and amount=%s;"
+                   % (AUCTION_ID, bidder, bid))
+    DBCONN.commit()
+
+    winning_bids = _get_winning_bids(AUCTION_ID)
 
     history = pprint.pformat(winning_bids)
     log(history)
-
-    pickledfile = open( pickle_filename, "wb" )
-    pickle.dump(winning_bids, pickledfile)
-    pickledfile.close()
-
-
 
 def brute_force_bid(site, max_price):
     """
@@ -207,15 +219,31 @@ if __name__ == '__main__':
     # used for checking if bid has changed
     _current_bid = None
 
-    pickle_filename = URL.split('/')[-1] + ".pickle"
 
-    try:
-        pickledfile = open( pickle_filename, "rb" )
-        winning_bids = pickle.load(pickledfile)
-        pickledfile.close()
-    except:
-        log('No pickle file found')
-        winning_bids = dict()
+    DBCONN = sqlite3.connect('veilingbot.db')
+    CURSOR = DBCONN.cursor()
+    CURSOR.execute("create table if not exists auction ("
+                   "id integer primary key autoincrement not null, "
+                   "url text);")
+    CURSOR.execute("create table if not exists bid ("
+                   "auction integer, "
+                   "datetime integer, "
+                   "name text, "
+                   "amount integer, "
+                   "winning integer, "
+                   "foreign key(auction) references auctions(id));")
+
+    CURSOR.execute("select id from auction where url = '%s'" % URL)
+    result = CURSOR.fetchone()
+    if not result:
+        CURSOR.execute("insert into auction values (NULL, '%s');" % URL)
+        DBCONN.commit()
+        CURSOR.execute("select id from auction where url = '%s'" % URL)
+        result = CURSOR.fetchone()
+
+    AUCTION_ID = result[0]
+
+    winning_bids = _get_winning_bids(AUCTION_ID)
 
     scheduler.enter(0, 1, begin, (URL,))
 
