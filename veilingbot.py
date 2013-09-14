@@ -2,7 +2,6 @@
 import pprint
 import sched
 import time
-import pickle
 import datetime
 import sys
 import traceback
@@ -81,10 +80,6 @@ def begin(url):
                         sys.stdout.flush()
                         log("User '%s' just raised the bid to '%s' on %s seconds left."
                             % (_latest_bidder, _current_bid, _remaining_secs))
-                        timestring = int(time.time())
-                        CURSOR.execute("insert into bid values (%s, %s, '%s', %s, 0);"
-                                       % (AUCTION_ID, timestring, _latest_bidder, _current_bid))
-                        DBCONN.commit()
 
                     if _remaining_secs < 6 and _current_bid < max_price:
                         we_won = brute_force_bid(SITE, max_price)
@@ -133,7 +128,7 @@ def begin(url):
         scheduler.enter(60, 1, begin, (url,))
 
 def _get_winning_bids(auction_id):
-    CURSOR.execute("select datetime, name, amount from bid where auction = %s and winning = 1;" % auction_id)
+    CURSOR.execute("select datetime, name, amount from winningbid where auction = %s;" % auction_id)
     result = CURSOR.fetchall()
     winning_bids = {}
     for r in result:
@@ -142,8 +137,9 @@ def _get_winning_bids(auction_id):
     return winning_bids
 
 def save_winning_bid_and_log_history(bid, bidder):
-    CURSOR.execute("UPDATE bid SET winning=1 WHERE auction=%s and name='%s' and amount=%s;"
-                   % (AUCTION_ID, bidder, bid))
+    timestring = int(time.time())
+    CURSOR.execute("insert into winningbid values (%s, %s, '%s', %s);"
+                   % (AUCTION_ID, timestring, bidder, bid))
     DBCONN.commit()
 
     winning_bids = _get_winning_bids(AUCTION_ID)
@@ -225,12 +221,12 @@ if __name__ == '__main__':
     CURSOR.execute("create table if not exists auction ("
                    "id integer primary key autoincrement not null, "
                    "url text);")
-    CURSOR.execute("create table if not exists bid ("
+    CURSOR.execute("create table if not exists winningbid ("
                    "auction integer, "
                    "datetime integer, "
                    "name text, "
                    "amount integer, "
-                   "winning integer, "
+#                   "winning integer, "
                    "foreign key(auction) references auctions(id));")
 
     CURSOR.execute("select id from auction where url = '%s'" % URL)
