@@ -30,7 +30,7 @@ try:
             sys.exit(0)
 
         for process in processes:
-            if not process.poll():
+            if process.poll():
                 # process has died
                 print "One process has died with returncode %s." % process.returncode
                 processes.remove(process)
