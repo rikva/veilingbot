@@ -114,7 +114,8 @@ class VakantieVeilingen():
             log(counter)
             if counter > 10:
                 log('Login failed.')
-                return False
+                make_screenshot(self.browser)
+            return False
         else:
             log('Logged in successfully.')
             return True

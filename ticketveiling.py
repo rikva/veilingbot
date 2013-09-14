@@ -1,6 +1,6 @@
 import time
 from selenium import webdriver
-from credentials import USERNAME, PASSWORD
+from tv_credentials import USERNAME, PASSWORD
 from veilingbotcore import log, make_screenshot
 
 
@@ -67,7 +67,9 @@ class TicketVeiling():
 
         email.send_keys(USERNAME)
         passwd.send_keys(PASSWORD)
-        button.click()
+#        button.click()
+        keys = webdriver.common.keys.Keys()
+        passwd.send_keys(keys.ENTER)
 
         counter = 0
         log('Waiting max. 30 seconds')
@@ -77,6 +79,7 @@ class TicketVeiling():
             log(counter)
             if counter > 30:
                 log('Login failed.')
+                make_screenshot(self.browser)
                 return False
         else:
             log('Logged in successfully.')

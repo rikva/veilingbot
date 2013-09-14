@@ -1,5 +1,5 @@
 *.png
 *.pickle*
 *.log
-credentials.py
+*credentials.py
 *.pyc
