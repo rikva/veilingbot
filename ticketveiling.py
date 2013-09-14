@@ -23,7 +23,7 @@ class TicketVeiling():
             if not splitted_remaining_time or splitted_remaining_time == [u'Gesloten']:
                 log('Auction has ended.')
                 make_screenshot(self.browser)
-                return 0
+                return
 
             if len(splitted_remaining_time) == 3:
                 # includes hour

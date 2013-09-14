@@ -23,6 +23,8 @@ try:
         print "Sleeping 10 seconds."
         sleep(10)
 
+    print "Done"
+
 
 
     # Start loop and check on processes
