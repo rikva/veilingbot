@@ -20,6 +20,9 @@ try:
         print "Starting process: %s" % command
         processes.append(subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True))
 
+        print "Sleeping 10 seconds."
+        sleep(10)
+
 
 
     # Start loop and check on processes
