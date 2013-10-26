@@ -10,22 +10,22 @@ parser.read('config.cfg')
 processes = []
 
 try:
-    for section in parser.sections():
-        url = parser.get(section, 'url')
-        maxprice = parser.get(section, 'maxprice')
-        action = parser.get(section, 'action')
-        browser = parser.get(section, 'browser')
+    with open("veilingbot.log", "a") as logfile:
 
-        command = "python veilingbot.py %s %s %s %s" % (url, maxprice, browser, action)
-        print "Starting process: %s" % command
-        processes.append(subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True))
+        for section in parser.sections():
+            url = parser.get(section, 'url')
+            maxprice = parser.get(section, 'maxprice')
+            action = parser.get(section, 'action')
+            browser = parser.get(section, 'browser')
 
-        print "Sleeping 10 seconds."
-        sleep(10)
+            command = "python veilingbot.py %s %s %s %s" % (url, maxprice, browser, action)
+            print "Starting process: %s" % command
+            processes.append(subprocess.Popen(command, stdout=logfile, stderr=logfile, shell=True))
 
-    print "Done"
+            print "Sleeping 10 seconds."
+            sleep(10)
 
-
+        print "Done"
 
     # Start loop and check on processes
     while True:

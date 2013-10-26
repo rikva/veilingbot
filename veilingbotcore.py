@@ -9,13 +9,11 @@ def log(msg):
     url = sys.argv[1]
 #    last_url_part = url.split("/")[-1].split(".")[0]
     last_url_part = url[-60:]
-    with open("veilingbot.log", "a") as logfile:
-        try:
-            logstring =  "%s [%s] : %s" % (time.ctime(), last_url_part, str(msg))
-            print logstring
-            logfile.write(logstring+"\n")
-        except:
-            print time.ctime() + ' : Could not decode string!'
+    try:
+        logstring =  "%s [%s] : %s" % (time.ctime(), last_url_part, str(msg))
+        print logstring
+    except:
+        print time.ctime() + ' : Could not decode string!'
 
 def make_screenshot(browser):
     # Ensure directory is created
