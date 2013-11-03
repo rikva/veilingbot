@@ -20,17 +20,19 @@ class VakantieVeilingen():
                 auction_time = self.browser.find_element_by_class_name('auction-time').text.lower()
                 hours = 0
                 mins = 0
-                secs = 0
-                if 'uur' in auction_time:
-                    hours, _, auction_time = auction_time.partition("uur")
-                if 'min' in auction_time:
-                    mins, _, auction_time = auction_time.partition("min")
-                if 'sec' in auction_time:
-                    secs, _, auction_time = auction_time.partition("sec")
-                else:
+
+                if not 'sec' in auction_time:
                     log('Auction has probably ended. Time string was: "%s"' % auction_time)
                     make_screenshot(self.browser)
                     return 0
+
+                if 'uur' in auction_time:
+                    hours, _, auction_time = auction_time.partition("uur")
+
+                if 'min' in auction_time:
+                    mins, _, auction_time = auction_time.partition("min")
+
+                secs, _, auction_time = auction_time.partition("sec")
 
                 seconds_left = int(secs)
                 seconds_left += (int(mins) * 60)
