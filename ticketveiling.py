@@ -1,7 +1,7 @@
 import time
 from selenium import webdriver
 from tv_credentials import USERNAME, PASSWORD
-from veilingbotcore import log, make_screenshot
+from veilingbotcore import log, make_screenshot, ravenclient
 
 
 class TicketVeiling():
@@ -57,6 +57,7 @@ class TicketVeiling():
         try:
             return ' '.join(div.find_elements_by_class_name("bidHistory")[0].text.split('\n')[2].split()[1:])
         except IndexError:
+            ravenclient.captureException()
             return "unknown"
 
     def do_login(self):
