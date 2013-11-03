@@ -51,7 +51,7 @@ class VakantieVeilingen():
                 log("EXCEPTION ! DEBUG: '%s'" % e)
                 log('Returning 11 seconds')
                 traceback.print_exc()
-                ravenclient.CaptureException()
+                ravenclient.captureException()
                 return 11
 
     #            raise
@@ -68,7 +68,7 @@ class VakantieVeilingen():
                         break
             except Exception as e:
                 log("DEBUG: Could not obtain price. Exception: %s.Printing traceback." % e)
-                ravenclient.CaptureException()
+                ravenclient.captureException()
                 traceback.print_exc()
 
     def get_latest_bidder(self):
@@ -79,7 +79,7 @@ class VakantieVeilingen():
             st = p.find_element_by_tag_name('strong')
             return st.text
         except:
-            ravenclient.CaptureException()
+            ravenclient.captureException()
             return 'unknown'
 
     def _is_logged_in(self):

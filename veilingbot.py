@@ -113,7 +113,7 @@ def begin(url):
         log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
         log("The exception was: '%s'" % e)
         traceback.print_exc()
-        ravenclient.CaptureException()
+        ravenclient.captureException()
         try:
             SITE.browser.quit()
         except: pass
@@ -123,7 +123,8 @@ def begin(url):
         log("Caught unexpected exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
         log("The exception was: '%s'" % e)
         traceback.print_exc()
-        ravenclient.CaptureException()
+        ravenclient.captureException()
+
 
         try:
             SITE.browser.quit()

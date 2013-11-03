@@ -17,7 +17,7 @@ def log(msg):
         print logstring
     except:
         print time.ctime() + ' : Could not decode string!'
-        ravenclient.CaptureException()
+        ravenclient.captureException()
 
 def make_screenshot(browser):
     # Ensure directory is created
