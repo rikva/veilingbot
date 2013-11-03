@@ -4,6 +4,8 @@ import datetime
 import os
 from selenium import webdriver
 from raven import Client
+from selenium.webdriver import DesiredCapabilities
+
 ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee04785997060943ba4a78a@localhost:9000/2")
 
 
@@ -70,6 +72,8 @@ def start_browser(url, browser="chrome"):
         browser = webdriver.Firefox(profile)
 
     elif browser == "phantomjs":
+        uastring = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/28.0.1500.71 Chrome/28.0.1500.71 Safari/537.36"
+        DesiredCapabilities.PHANTOMJS['phantomjs.page.settings.userAgent'] = uastring
         browser = webdriver.PhantomJS('./phantomjs-1.9.1-linux-x86_64/bin/phantomjs')
 
     elif browser == "htmlunit":
@@ -79,6 +83,8 @@ def start_browser(url, browser="chrome"):
         log("Unknown browser specified")
         return
 
+    # So we don't get directed to mobile sites
+    browser.set_window_size(1680, 1050)
     go_to_url(browser, url)
     return browser
 

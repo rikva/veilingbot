@@ -17,33 +17,24 @@ class VakantieVeilingen():
         seconds_left = ''
         while not seconds_left.isdigit():
             try:
-                counter_span = self.browser.find_element_by_class_name('counter-running')
-                celement = counter_span.find_element_by_tag_name('span')
-                splitted_timestring = celement.text.split()
-
-                if splitted_timestring == [] or splitted_timestring[0] == 'Gesloten' or splitted_timestring[0] == '':
-                    log('Auction has ended.')
-
+                auction_time = self.browser.find_element_by_class_name('auction-time').text.lower()
+                hours = 0
+                mins = 0
+                secs = 0
+                if 'uur' in auction_time:
+                    hours, _, auction_time = auction_time.partition("uur")
+                if 'min' in auction_time:
+                    mins, _, auction_time = auction_time.partition("min")
+                if 'sec' in auction_time:
+                    secs, _, auction_time = auction_time.partition("sec")
+                else:
+                    log('Auction has probably ended.')
                     make_screenshot(self.browser)
-
                     return 0
 
-                if len(splitted_timestring) == 6:
-                    # includes hour
-                    remaining_hours = int(splitted_timestring[0])
-                elif len(splitted_timestring) == 4:
-                    # excludes hour
-                    remaining_hours = 0
-                else:
-                    # something is wrong
-                    log("DEBUG: Could not parse splitted_timestring '%s', auction is probably ending." % splitted_timestring)
-
-                remaining_mins = int(splitted_timestring[-4])
-                remaining_secs = int(splitted_timestring[-2])
-                seconds_left = remaining_secs
-                seconds_left += (remaining_mins * 60)
-                seconds_left += ((remaining_hours * 60) * 60)
-                seconds_left = int(seconds_left)
+                seconds_left = int(secs)
+                seconds_left += (int(mins) * 60)
+                seconds_left += ((int(hours) * 60) * 60)
                 return seconds_left
 
             except Exception as e:
@@ -58,26 +49,17 @@ class VakantieVeilingen():
 
 
     def get_current_bid(self):
-        for i in range(10):
-            try:
-                for price in self.browser.find_elements_by_class_name('price'):
-                    if price.text:
-                        if len(price.text.split()) == 2:
-                            return int(price.text.split()[1])
-                        log("Woah wait this should not happen")
-                        break
-            except Exception as e:
-                log("DEBUG: Could not obtain price. Exception: %s.Printing traceback." % e)
-                ravenclient.captureException()
-                traceback.print_exc()
+        price = self.browser.find_element_by_xpath("//span[@ng-model='auction.price.amount']")
+        if price.is_displayed():
+            return int(price.text)
+
 
     def get_latest_bidder(self):
         try:
-            bh = self.browser.find_element_by_id('biddinghistory')
-            li = bh.find_element_by_tag_name('li')
-            p = li.find_element_by_tag_name('p')
-            st = p.find_element_by_tag_name('strong')
-            return st.text
+            first_name = self.browser.find_elements_by_xpath('//span[@ng-bind="bid.customer.firstName"]')[0].text
+            prefix = self.browser.find_elements_by_xpath('//span[@ng-bind="bid.customer.lastNamePrefix"]')[0].text
+            last_name = self.browser.find_elements_by_xpath('//span[@ng-bind="bid.customer.lastName"]')[0].text
+            return "%s %s %s" % (first_name, prefix, last_name)
         except:
             ravenclient.captureException()
             return 'unknown'
@@ -93,16 +75,12 @@ class VakantieVeilingen():
             return True
 
         log('Signing in')
-        open_login = self.browser.find_element_by_class_name('openLogin')
-        open_login.click()
+        self.browser.find_element_by_link_text("Inloggen").click()
         time.sleep(1)
 
-        email = self.browser.find_element_by_id('loginEmailField')
-        passwd = self.browser.find_element_by_id('loginPasswordField')
-
-        form = self.browser.find_element_by_id('LoginForm')
-        fieldset = form.find_element_by_tag_name('fieldset')
-        button = fieldset.find_elements_by_tag_name('input')[-1]
+        email = [f for f in self.browser.find_elements_by_xpath("//input[@ng-model='email']") if f.is_displayed()][0]
+        passwd = [f for f in self.browser.find_elements_by_xpath("//input[@ng-model='password']") if f.is_displayed()][0]
+        button = [f for f in self.browser.find_elements_by_xpath("//input[@value='Login']") if f.is_displayed()][0]
 
         email.send_keys(USERNAME)
         passwd.send_keys(PASSWORD)
@@ -133,22 +111,16 @@ class VakantieVeilingen():
                 (price, self.max_price))
         else:
             log("Placing bid of '%s' euro" % price )
-            ub = self.browser.find_element_by_id('userBid')
+            ub = self.browser.find_element_by_xpath("//input[@name='bidAmount']")
             # first clear the input field!
             log('DEBUG: Clearing input field')
             ub.clear()
             log('DEBUG: Sending %s to input field' % price)
             ub.send_keys(price)
-            bm = self.browser.find_element_by_id('PrototypeLoginTrigger')
-            # The "Bid" button
-            log('DEBUG: clicking PrototypeLoginTrigger button')
-            bm.click()
+            self.browser.find_element_by_link_text("Bied mee!").click()
             time.sleep(0.2)
             try:
-                pb = self.browser.find_element_by_id('placeBidButton')
-                # The "Confirm" button
-                log('DEBUG: Clicking placeBidButton')
-                pb.click()
+                self.browser.find_element_by_link_text("Plaats bod").click()
             except ElementNotVisibleException:
                 # This can happen when auto-confirm is checked.
                 log("Could not confirm, this is propably OK.")
