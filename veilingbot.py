@@ -11,7 +11,7 @@ from credentials import MY_NAME as VV_NAME
 from tv_credentials import MY_NAME as TV_NAME
 from ticketveiling import TicketVeiling
 from vakantieveilingen import VakantieVeilingen
-from veilingbotcore import log, start_browser, close_cookie_dialogs
+from veilingbotcore import log, start_browser, close_cookie_dialogs, ravenclient
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
@@ -113,6 +113,7 @@ def begin(url):
         log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
         log("The exception was: '%s'" % e)
         traceback.print_exc()
+        ravenclient.CaptureException()
         try:
             SITE.browser.quit()
         except: pass
@@ -122,6 +123,7 @@ def begin(url):
         log("Caught unexpected exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
         log("The exception was: '%s'" % e)
         traceback.print_exc()
+        ravenclient.CaptureException()
 
         try:
             SITE.browser.quit()

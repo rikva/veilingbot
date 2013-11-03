@@ -2,8 +2,7 @@ import traceback
 import time
 from selenium.common.exceptions import ElementNotVisibleException
 from credentials import USERNAME, PASSWORD
-from veilingbotcore import log, make_screenshot
-
+from veilingbotcore import log, make_screenshot, ravenclient
 
 class VakantieVeilingen():
     def __init__(self,
@@ -52,6 +51,7 @@ class VakantieVeilingen():
                 log("EXCEPTION ! DEBUG: '%s'" % e)
                 log('Returning 11 seconds')
                 traceback.print_exc()
+                ravenclient.CaptureException()
                 return 11
 
     #            raise
@@ -68,6 +68,7 @@ class VakantieVeilingen():
                         break
             except Exception as e:
                 log("DEBUG: Could not obtain price. Exception: %s.Printing traceback." % e)
+                ravenclient.CaptureException()
                 traceback.print_exc()
 
     def get_latest_bidder(self):
@@ -78,6 +79,7 @@ class VakantieVeilingen():
             st = p.find_element_by_tag_name('strong')
             return st.text
         except:
+            ravenclient.CaptureException()
             return 'unknown'
 
     def _is_logged_in(self):

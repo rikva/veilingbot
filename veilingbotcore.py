@@ -3,6 +3,9 @@ import time
 import datetime
 import os
 from selenium import webdriver
+from raven import Client
+ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee04785997060943ba4a78a@localhost:9000/2")
+
 
 def log(msg):
     # to avoid encoding hell:
@@ -14,6 +17,7 @@ def log(msg):
         print logstring
     except:
         print time.ctime() + ' : Could not decode string!'
+        ravenclient.CaptureException()
 
 def make_screenshot(browser):
     # Ensure directory is created
