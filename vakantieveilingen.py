@@ -17,7 +17,12 @@ class VakantieVeilingen():
         seconds_left = ''
         while not seconds_left.isdigit():
             try:
-                auction_time = self.browser.find_element_by_class_name('auction-time').text.lower()
+
+                # it can take a few moments for the auction time to dynamically load. Before that, it's empty
+                auction_time = ""
+                while auction_time == "":
+                    auction_time = self.browser.find_element_by_class_name('auction-time').text.lower()
+
                 hours = 0
                 mins = 0
 
