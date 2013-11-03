@@ -28,7 +28,7 @@ class VakantieVeilingen():
                 if 'sec' in auction_time:
                     secs, _, auction_time = auction_time.partition("sec")
                 else:
-                    log('Auction has probably ended.')
+                    log('Auction has probably ended. Time string was: "%s"' % auction_time)
                     make_screenshot(self.browser)
                     return 0
 
@@ -126,7 +126,7 @@ class VakantieVeilingen():
                 self.browser.find_element_by_link_text("Plaats bod").click()
             except ElementNotVisibleException:
                 # This can happen when auto-confirm is checked.
-                log("Could not confirm, this is propably OK.")
+                log("Could not confirm, this is probably OK.")
             log('Placed bid for %s EUR' % price)
             time.sleep(0.2)
             # Try to close all dialogs:
