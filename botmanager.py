@@ -18,7 +18,7 @@ try:
             action = parser.get(section, 'action')
             browser = parser.get(section, 'browser')
 
-            command = "python veilingbot.py %s %s %s %s" % (url, maxprice, browser, action)
+            command = "python -u veilingbot.py %s %s %s %s" % (url, maxprice, browser, action)
             print "Starting process: %s" % command
             processes.append(subprocess.Popen(command, stdout=logfile, stderr=logfile, shell=True))
 
