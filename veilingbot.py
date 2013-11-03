@@ -50,7 +50,7 @@ def begin(url):
                     % (SITE.get_current_bid(), max_price))
                 login = True
             else:
-                log("Not logging in; current bid (%s) is higher than our max price (%s)."
+                log("Not logging in; current bid (%s) is higher than, or equal to, our max price (%s)."
                     %(SITE.get_current_bid(), max_price))
                 login = False
 

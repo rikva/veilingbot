@@ -59,7 +59,10 @@ class VakantieVeilingen():
             first_name = self.browser.find_elements_by_xpath('//span[@ng-bind="bid.customer.firstName"]')[0].text
             prefix = self.browser.find_elements_by_xpath('//span[@ng-bind="bid.customer.lastNamePrefix"]')[0].text
             last_name = self.browser.find_elements_by_xpath('//span[@ng-bind="bid.customer.lastName"]')[0].text
-            return "%s %s %s" % (first_name, prefix, last_name)
+            if prefix:
+                return "%s %s %s" % (first_name, prefix, last_name)
+            return "%s %s" % (first_name, last_name)
+
         except:
             ravenclient.captureException()
             return 'unknown'
@@ -95,7 +98,7 @@ class VakantieVeilingen():
             if counter > 10:
                 log('Login failed.')
                 make_screenshot(self.browser)
-            return False
+                return False
         else:
             log('Logged in successfully.')
             return True
