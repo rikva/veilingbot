@@ -88,3 +88,25 @@ def start_browser(url, browser="chrome"):
     go_to_url(browser, url)
     return browser
 
+def click_element_when_available(find_function, element, secs_between_tries=0.1, max_tries=20):
+    counter = 0
+    while not find_function(element):
+        log("Element %s not (yet) found" % element)
+        time.sleep(secs_between_tries)
+        counter +=1
+        if counter > max_tries:
+            raise RuntimeError("Element not found")
+    else:
+        found = find_function(element)
+
+    while not found.is_displayed():
+        log("Element %s not (yet) visisble" % element)
+        time.sleep(secs_between_tries)
+        counter +=1
+        if counter > max_tries:
+            raise RuntimeError("Element not visible")
+    else:
+        log("Clicking element %s" % element)
+        found.click()
+
+

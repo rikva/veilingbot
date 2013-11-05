@@ -2,7 +2,7 @@ import traceback
 import time
 from selenium.common.exceptions import ElementNotVisibleException
 from credentials import USERNAME, PASSWORD
-from veilingbotcore import log, make_screenshot, ravenclient
+from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available
 
 class VakantieVeilingen():
     def __init__(self,
@@ -85,7 +85,7 @@ class VakantieVeilingen():
             return True
 
         log('Signing in')
-        self.browser.find_element_by_link_text("Inloggen").click()
+        click_element_when_available(self.browser.find_element_by_link_text, "Inloggen")
         time.sleep(1)
 
         email = [f for f in self.browser.find_elements_by_xpath("//input[@ng-model='email']") if f.is_displayed()][0]
@@ -127,7 +127,8 @@ class VakantieVeilingen():
             ub.clear()
             log('DEBUG: Sending %s to input field' % price)
             ub.send_keys(price)
-            self.browser.find_element_by_link_text("Bied mee!").click()
+            click_element_when_available(self.browser.find_element_by_link_text, "Bied mee!")
+
             time.sleep(0.2)
             try:
                 self.browser.find_element_by_link_text("Plaats bod").click()

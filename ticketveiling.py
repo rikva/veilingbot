@@ -1,7 +1,7 @@
 import time
 from selenium import webdriver
 from tv_credentials import USERNAME, PASSWORD
-from veilingbotcore import log, make_screenshot, ravenclient
+from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available
 
 
 class TicketVeiling():
@@ -111,12 +111,10 @@ class TicketVeiling():
             time.sleep(0.1)
 
             log('DEBUG: Clicking YES')
-            yes_button = self.browser.find_element_by_class_name("yesButton")
-            yes_button.click()
+            click_element_when_available(self.browser.find_element_by_class_name, "yesButton")
 
             log('DEBUG: Clicking OK')
-            ok_button = self.browser.find_element_by_class_name("yesButtonCentered")
-            ok_button.click()
+            click_element_when_available(self.browser.find_element_by_class_name, "yesButtonCentered")
 
             log('Placed bid for %s EUR' % price)
             time.sleep(0.2)
