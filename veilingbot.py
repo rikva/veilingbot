@@ -131,9 +131,9 @@ def begin(url):
 def _get_winning_bids(auction_id):
     CURSOR.execute("select datetime, name, amount from winningbid where auction = %s;" % auction_id)
     result = CURSOR.fetchall()
-    winning_bids = {}
+    winning_bids = []
     for r in result:
-        winning_bids[r[0]] = {r[1]: r[2]}
+        winning_bids.append(r[2])
 
     return winning_bids
 
@@ -145,8 +145,10 @@ def save_winning_bid_and_log_history(bid, bidder):
 
     winning_bids = _get_winning_bids(AUCTION_ID)
 
-    history = pprint.pformat(winning_bids)
-    log(history)
+    lowest_bid = sorted(winning_bids)[0]
+    highest_bid = sorted(winning_bids)[-1]
+    log("Lowest bid: %s | Highest bid: %s" % (lowest_bid, highest_bid))
+
 
 def brute_force_bid(site, max_price):
     """
