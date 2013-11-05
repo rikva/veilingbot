@@ -62,9 +62,6 @@ def begin(url):
                 close_cookie_dialogs(browser)
 
                 while SITE.get_remaining_secs() > 0:
-                    sys.stdout.write(".")
-                    sys.stdout.flush()
-
                     global _current_bid
                     global _latest_bidder
                     global _remaining_secs
