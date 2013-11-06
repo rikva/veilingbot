@@ -129,12 +129,13 @@ class VakantieVeilingen():
             ub.send_keys(price)
             click_element_when_available(self.browser.find_element_by_link_text, "Bied mee!")
 
-            time.sleep(0.2)
-            try:
-                self.browser.find_element_by_link_text("Plaats bod").click()
-            except (ElementNotVisibleException, NoSuchElementException):
-                # This can happen when auto-confirm is checked.
-                log("Could not confirm, this is probably OK.")
+            click_element_when_available(self.browser.find_elements_by_link_text, "Plaats bod", max_tries=5)
+#            time.sleep(0.2)
+#            try:
+#                self.browser.find_element_by_link_text("Plaats bod").click()
+#            except (ElementNotVisibleException, NoSuchElementException):
+#                # This can happen when auto-confirm is checked.
+#                log("Could not confirm, this is probably OK.")
             log('Placed bid for %s EUR' % price)
             time.sleep(0.2)
             # Try to close all dialogs:
