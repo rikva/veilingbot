@@ -1,6 +1,6 @@
 import traceback
 import time
-from selenium.common.exceptions import ElementNotVisibleException
+from selenium.common.exceptions import ElementNotVisibleException, NoSuchElementException
 from credentials import USERNAME, PASSWORD
 from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available
 
@@ -132,7 +132,7 @@ class VakantieVeilingen():
             time.sleep(0.2)
             try:
                 self.browser.find_element_by_link_text("Plaats bod").click()
-            except ElementNotVisibleException:
+            except (ElementNotVisibleException, NoSuchElementException):
                 # This can happen when auto-confirm is checked.
                 log("Could not confirm, this is probably OK.")
             log('Placed bid for %s EUR' % price)
