@@ -4,6 +4,7 @@ import datetime
 import os
 from selenium import webdriver
 from raven import Client
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import DesiredCapabilities
 
 ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee04785997060943ba4a78a@localhost:9000/2")
@@ -116,10 +117,14 @@ def click_element_when_available(find_function, element, secs_between_tries=0.1,
 
 def wait_for_element(find_function, element, max_secs=30):
     counter = 0
-    while not find_function(element):
-        time.sleep(1)
-        if counter >= max_secs:
-            raise RuntimeError("Element not found")
+    found = None
+    while not found:
+        try:
+            found = find_function(element)
+        except NoSuchElementException:
+            time.sleep(1)
+            if counter >= max_secs:
+                raise
     else:
         return find_function(element)
 
