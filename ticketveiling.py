@@ -55,7 +55,10 @@ class TicketVeiling():
         if not div.is_displayed():
             div = self.browser.find_element_by_id("bidHistory")
         try:
-            return ' '.join(div.find_elements_by_class_name("bidHistory")[0].text.split('\n')[2].split()[1:])
+            last_bid = div.find_elements_by_class_name("bidHistory")[0].text
+            time_and_name = last_bid.split("\n")[2]
+            name = time_and_name.split()[1:]
+            return ' '.join(name)
         except IndexError:
             ravenclient.captureException()
             return "unknown"
