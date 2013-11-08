@@ -114,3 +114,15 @@ def click_element_when_available(find_function, element, secs_between_tries=0.1,
         found.click()
 
 
+def wait_for_element(find_function, element, max_secs=30):
+    counter = 0
+    while not find_function(element):
+        time.sleep(1)
+        if counter >= max_secs:
+            raise RuntimeError("Element not found")
+    else:
+        return find_function(element)
+
+
+
+

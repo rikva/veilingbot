@@ -1,7 +1,7 @@
 import time
 from selenium import webdriver
 from tv_credentials import USERNAME, PASSWORD
-from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available
+from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available, wait_for_element
 
 
 class TicketVeiling():
@@ -51,7 +51,7 @@ class TicketVeiling():
 
 
     def get_latest_bidder(self):
-        div = self.browser.find_element_by_id("bids")
+        div = wait_for_element(self.browser.find_element_by_id, "bids")
         if not div.is_displayed():
             div = self.browser.find_element_by_id("bidHistory")
         try:
