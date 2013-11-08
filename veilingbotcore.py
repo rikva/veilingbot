@@ -85,6 +85,10 @@ def start_browser(url, browser="chrome"):
 
     # So we don't get directed to mobile sites
     browser.set_window_size(1680, 1050)
+
+    # Set implicit wait to a few seconds, to prevent flooding of exceptions
+    browser.implicitly_wait(time_to_wait=5)
+
     go_to_url(browser, url)
     return browser
 
