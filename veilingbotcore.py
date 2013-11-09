@@ -14,7 +14,7 @@ def log(msg):
     # to avoid encoding hell:
     url = sys.argv[1]
 #    last_url_part = url.split("/")[-1].split(".")[0]
-    last_url_part = url[-60:]
+    last_url_part = url[-30:]
     try:
         logstring =  "%s [%s] : %s" % (time.ctime(), last_url_part, str(msg))
         print logstring
