@@ -185,13 +185,14 @@ def brute_force_bid(site, max_price):
                     log("Current bid is higher than or equal to my max price")
                     return False
 
+        log("DEBUG: Still in brute force bid mode. Current bid: %d | my last bid: %d" % (_current_bid, my_last_bid))
         time.sleep(0.1)
 
     # We assume that we have won! But
     # Let's check if we have lost
 
     # Wait a few seconds
-    log("Checking if we lost")
+    log("Checking if we've lost")
     time.sleep(3)
     winning_bidder = site.get_latest_bidder()
     last_bid = site.get_current_bid()
@@ -206,7 +207,7 @@ def brute_force_bid(site, max_price):
         return False
 
     # Wait... we have won!
-    log("I's possible that we've won.")
+    log("It's possible that we've won.")
     return True
 
 

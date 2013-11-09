@@ -117,7 +117,7 @@ class VakantieVeilingen():
             return
 
         if int(price) > int(self.max_price):
-            log("FAILSAFE (this should not happen): not placing bid of %s, it's higher than %s" %
+            raise RuntimeError("FAILSAFE (this should not happen): not placing bid of %s, it's higher than %s" %
                 (price, self.max_price))
         else:
             log("Placing bid of '%s' euro" % price )

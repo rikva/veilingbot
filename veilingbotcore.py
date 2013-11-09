@@ -116,12 +116,14 @@ def click_element_when_available(find_function, element, secs_between_tries=0.1,
 
 
 def wait_for_element(find_function, element, max_secs=30):
+    log("DEBUG: using function %s to find element %s for %d seconds" % (find_function, element, max_secs))
     counter = 0
     found = None
     while not found:
         try:
             found = find_function(element)
         except NoSuchElementException:
+            log("DEBUG: [%d] Element not found." % counter)
             time.sleep(1)
             if counter >= max_secs:
                 raise
