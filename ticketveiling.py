@@ -36,14 +36,18 @@ class TicketVeiling():
                 # something is wrong
                 log("DEBUG: Could not parse splitted_remaining_time '%s', auction is probably ending."
                     % splitted_remaining_time)
-
-            remaining_mins = int(splitted_remaining_time[-2].split("min")[0])
-            remaining_secs = int(splitted_remaining_time[-1].split("sec")[0])
-            seconds_left = remaining_secs
-            seconds_left += (remaining_mins * 60)
-            seconds_left += ((remaining_hours * 60) * 60)
-            seconds_left = int(seconds_left)
-            return seconds_left
+            try:
+                remaining_mins = int(splitted_remaining_time[-2].split("min")[0])
+                remaining_secs = int(splitted_remaining_time[-1].split("sec")[0])
+                seconds_left = remaining_secs
+                seconds_left += (remaining_mins * 60)
+                seconds_left += ((remaining_hours * 60) * 60)
+                seconds_left = int(seconds_left)
+                return seconds_left
+            except ValueError:
+                log("Caught ValueError")
+                log(counter)
+                raise
 
     def get_current_bid(self):
         for price in self.browser.find_elements_by_class_name('priceVeiling'):
