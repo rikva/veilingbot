@@ -116,15 +116,19 @@ class TicketVeiling():
             log('DEBUG: Sending %s to input field' % price)
             ub.send_keys(price)
 
-            log('DEBUG: Sending ENTER to input field')
-            keys = webdriver.common.keys.Keys()
-            ub.send_keys(keys.ENTER)
+#            log('DEBUG: Sending ENTER to input field')
+#            keys = webdriver.common.keys.Keys()
+#            ub.send_keys(keys.ENTER)
+
+            log("DEBUG: Clicking Bid button")
+            bb = self.browser.find_element_by_id('bidButton')
+            bb.click()
 
             time.sleep(0.1)
-
             log('DEBUG: Clicking YES')
             click_element_when_available(self.browser.find_element_by_class_name, "yesButton")
 
+            time.sleep(0.1)
             log('DEBUG: Clicking OK')
             click_element_when_available(self.browser.find_element_by_class_name, "yesButtonCentered")
 
