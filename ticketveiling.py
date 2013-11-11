@@ -51,7 +51,7 @@ class TicketVeiling():
 
 
     def get_latest_bidder(self):
-        div = wait_for_element(self.browser.find_element_by_id, "bids")
+        div = wait_for_element(self.browser.find_element_by_id, "bids", max_secs=240)
         if not div.is_displayed():
             div = self.browser.find_element_by_id("bidHistory")
         try:
