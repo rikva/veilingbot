@@ -11,8 +11,10 @@ ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee0478599
 
 
 def log(msg):
-    # to avoid encoding hell:
-    url = sys.argv[1]
+    if len(sys.argv) >= 2:
+        url = sys.argv[1]
+    else:
+        url = "NO URL"
 #    last_url_part = url.split("/")[-1].split(".")[0]
     last_url_part = url[-30:]
     try:
