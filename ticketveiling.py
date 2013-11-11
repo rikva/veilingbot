@@ -1,5 +1,6 @@
 import time
 from selenium import webdriver
+from selenium.common.exceptions import StaleElementReferenceException
 from tv_credentials import USERNAME, PASSWORD
 from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available, wait_for_element
 
@@ -59,6 +60,14 @@ class TicketVeiling():
             time_and_name = last_bid.split("\n")[2]
             name = time_and_name.split()[1:]
             return ' '.join(name)
+        except StaleElementReferenceException:
+            log("Caught StaleElementReferenceException")
+            log("Going to log div elements")
+            log(div)
+            log(div.find_elements_by_class_name("bidHistory"))
+            log([e.is_displayed() for e in div.find_elements_by_class_name("bidHistory")])
+            ravenclient.captureException()
+
         except IndexError:
             ravenclient.captureException()
             return "unknown"
