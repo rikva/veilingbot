@@ -99,7 +99,7 @@ def begin(url):
                     browser.quit()
                     scheduler.enter(5, 1, begin, (url,))
 
-        elif SITE.get_remaining_secs() is None:
+        elif SITE.get_remaining_secs() in (None, 0):
             log('Auction seems to be closed. Scheduling restart in 60 secs.')
             scheduler.enter(60, 1, begin, (url,))
 
