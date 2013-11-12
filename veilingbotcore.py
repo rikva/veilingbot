@@ -125,7 +125,7 @@ def wait_for_element(find_function, element, max_secs=30):
         try:
             found = find_function(element)
         except NoSuchElementException:
-            log("DEBUG: [%d] Element not found." % counter)
+            log("DEBUG: [%d] Element '%s' not found." % (counter, element))
             time.sleep(1)
             counter += 1
             if counter >= max_secs:
