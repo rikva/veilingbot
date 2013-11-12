@@ -42,7 +42,7 @@ def begin(url):
             scheduler.enter(wait_secs, 0, begin, (url,))
             browser.quit()
 
-        elif SITE.get_remaining_secs() is not None:
+        elif SITE.get_remaining_secs() is not None and SITE.get_remaining_secs() > 0:
 
             # Only login when the current bid is below our max price.
             if SITE.get_current_bid() < max_price:
