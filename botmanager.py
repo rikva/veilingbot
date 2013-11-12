@@ -31,6 +31,9 @@ def signal_handler_sighup(signal, frame):
     kill_processes()
     main()
 
+signal.signal(signal.SIGINT, signal_handler_sigint)
+signal.signal(signal.SIGHUP, signal_handler_sighup)
+
 def main():
     try:
         parser = SafeConfigParser()
@@ -65,9 +68,6 @@ def main():
                     # process has died
                     print "One process has died with returncode %s." % process.returncode
                     PROCESSES.remove(process)
-
-            signal.signal(signal.SIGINT, signal_handler_sigint)
-            signal.signal(signal.SIGHUP, signal_handler_sighup)
 
     except Exception:
         print "Exception! Killing all processes..."
