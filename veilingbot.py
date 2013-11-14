@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import pprint
 import sched
 import time
 import datetime
@@ -14,6 +13,15 @@ from vakantieveilingen import VakantieVeilingen
 from veilingbotcore import log, start_browser, close_cookie_dialogs, ravenclient
 
 scheduler = sched.scheduler(time.time, time.sleep)
+
+class VeilingAPI(object):
+    def __init__(self,
+                 browser,
+                 max_price,
+                 action="dryrun"):
+        self.browser = browser
+        self.action = action
+        self.max_price = max_price
 
 
 def begin(url):
@@ -250,3 +258,5 @@ if __name__ == '__main__':
     log('Starting scheduler')
     scheduler.run()
     log('Scheduler finished')
+
+

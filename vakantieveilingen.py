@@ -2,17 +2,10 @@ import traceback
 import time
 from selenium.common.exceptions import ElementNotVisibleException, NoSuchElementException
 from credentials import USERNAME, PASSWORD
+from veilingbot import VeilingAPI
 from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available
 
-class VakantieVeilingen():
-    def __init__(self,
-                 browser,
-                 max_price,
-                 action="dryrun"):
-        self.browser = browser
-        self.action = action
-        self.max_price = max_price
-
+class VakantieVeilingen(VeilingAPI):
     def get_remaining_secs(self):
         seconds_left = ''
         while not seconds_left.isdigit():
