@@ -9,6 +9,43 @@ from selenium.webdriver import DesiredCapabilities
 
 ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee04785997060943ba4a78a@localhost:9000/2")
 
+class VeilingAPI(object):
+    def __init__(self,
+                 browser,
+                 max_price,
+                 action="dryrun"):
+        self.browser = browser
+        self.action = action
+        self.max_price = max_price
+
+    ## skeleton functions ##
+    def do_place_bid(self, price):
+        pass
+
+    def get_current_bid(self):
+        pass
+
+    def get_latest_bidder(self):
+        pass
+
+    def get_remaining_secs(self):
+        pass
+
+    def do_login(self):
+        pass
+
+    def place_bid(self, price):
+        self.do_place_bid(price)
+        time.sleep(0.1)
+        if not self.get_current_bid() >= price:
+            log("Uh oh, it seems that my bid did not register! Trying again just once.")
+            self.do_place_bid(price)
+            time.sleep(0.1)
+            if not self.get_current_bid() >= price:
+                log("Uh oh, it seems that my bid did not register! Screenshotting and failing hard.")
+                make_screenshot(self.browser)
+                raise RuntimeError("Placing bid failed")
+
 
 def log(msg):
     if len(sys.argv) >= 2:

@@ -10,18 +10,9 @@ from credentials import MY_NAME as VV_NAME
 from tv_credentials import MY_NAME as TV_NAME
 from ticketveiling import TicketVeiling
 from vakantieveilingen import VakantieVeilingen
-from veilingbotcore import log, start_browser, close_cookie_dialogs, ravenclient
+from veilingbotcore import log, start_browser, close_cookie_dialogs, ravenclient, make_screenshot
 
 scheduler = sched.scheduler(time.time, time.sleep)
-
-class VeilingAPI(object):
-    def __init__(self,
-                 browser,
-                 max_price,
-                 action="dryrun"):
-        self.browser = browser
-        self.action = action
-        self.max_price = max_price
 
 
 def begin(url):
@@ -188,7 +179,7 @@ def brute_force_bid(site, max_price):
                 my_last_bid = _current_bid+1
                 if my_last_bid <= max_price:
                     log("Placing bid of %s" % my_last_bid)
-                    site.do_place_bid(my_last_bid)
+                    site.place_bid(my_last_bid)
                 else:
                     log("Current bid is higher than or equal to my max price")
                     return False

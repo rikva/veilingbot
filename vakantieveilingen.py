@@ -2,8 +2,7 @@ import traceback
 import time
 from selenium.common.exceptions import ElementNotVisibleException, NoSuchElementException
 from credentials import USERNAME, PASSWORD
-from veilingbot import VeilingAPI
-from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available
+from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available, VeilingAPI
 
 class VakantieVeilingen(VeilingAPI):
     def get_remaining_secs(self):

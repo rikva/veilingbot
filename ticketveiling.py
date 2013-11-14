@@ -2,8 +2,7 @@ import time
 from selenium import webdriver
 from selenium.common.exceptions import StaleElementReferenceException
 from tv_credentials import USERNAME, PASSWORD
-from veilingbot import VeilingAPI
-from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available, wait_for_element
+from veilingbotcore import log, make_screenshot, ravenclient, click_element_when_available, wait_for_element, VeilingAPI
 
 
 class TicketVeiling(VeilingAPI):
