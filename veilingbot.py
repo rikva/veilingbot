@@ -27,6 +27,7 @@ def begin(url):
             print "Cannot detect URL"
             sys.exit(1)
 
+        SITE = None  # So we can check if var has been initialized below
         browser = start_browser(url, browser=USE_BROWSER)
         SITE = Site(browser=browser, max_price=max_price, action=ACTION)
 
@@ -110,6 +111,12 @@ def begin(url):
         #log("The exception was: '%s'" % e)
         #traceback.print_exc()
         log("Caught WebDriverException. Trying a refresh.")
+        if SITE is None:
+            log("Nope, SITE is None - capturing exception")
+            ravenclient.captureException()
+            log("Scheduling a restart")
+            scheduler.enter(15, 1, begin, (url,))
+            return
         try:
             SITE.browser.refresh()
         except:
