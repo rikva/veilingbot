@@ -11,6 +11,7 @@ from tv_credentials import MY_NAME as TV_NAME
 
 ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee04785997060943ba4a78a@localhost:9000/2")
 
+
 class VeilingAPI(object):
     def __init__(self,
                  browser,
@@ -71,6 +72,7 @@ def log(msg):
         print time.ctime() + ' : Could not decode string!'
         ravenclient.captureException()
 
+
 def make_screenshot(browser):
     # Ensure directory is created
     if not os.path.exists("screenshots"):
@@ -89,6 +91,7 @@ def go_to_url(browser, url):
     log("Opening page succeeded in %s seconds." % elapsed_secs.seconds)
     close_cookie_dialogs(browser)
 
+
 def close_cookie_dialogs(browser):
     try:
         # Hack to close cookie dialog, better for screenshots
@@ -106,6 +109,7 @@ def close_cookie_dialogs(browser):
                     log("Closed one cookie warning dialog")
     except:
         pass
+
 
 def start_browser(url, browser="chrome"):
     log("Starting browser")
@@ -141,6 +145,7 @@ def start_browser(url, browser="chrome"):
 
     go_to_url(browser, url)
     return browser
+
 
 def click_element_when_available(find_function, element, secs_between_tries=0.1, max_tries=20):
     counter = 0
