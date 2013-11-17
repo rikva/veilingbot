@@ -187,6 +187,9 @@ def brute_force_bid(site, max_price):
         log("DEBUG: Still in brute force bid mode. Current bid: %d | my last bid: %d" % (_current_bid, my_last_bid))
         time.sleep(0.1)
 
+    # First, create a screenshot
+    make_screenshot(site.browser)
+
     # We assume that we have won! But
     # Let's check if we have lost
 
