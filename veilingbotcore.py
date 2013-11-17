@@ -35,6 +35,7 @@ class VeilingAPI(object):
         pass
 
     def place_bid(self, price):
+        log("Instructing API to place bid of %d EUR" % price)
         self.do_place_bid(price)
         time.sleep(0.1)
         if not self.get_current_bid() >= price:
