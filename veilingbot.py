@@ -106,14 +106,15 @@ def begin(url):
             log('This should not happen.')
 
     except WebDriverException as e:
-        log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
-        log("The exception was: '%s'" % e)
-        traceback.print_exc()
+        #log("Caught WebDriverException, the browser probably crashed. Forcing browser quit and rescheduling restart in 10 seconds.")
+        #log("The exception was: '%s'" % e)
+        #traceback.print_exc()
+        log("Caught WebDriverException. Trying a refresh.")
         ravenclient.captureException()
-        try:
-            SITE.browser.quit()
-        except: pass
-        scheduler.enter(15, 1, begin, (url,))
+        #try:
+        SITE.browser.refresh()
+        #except: pass
+        #scheduler.enter(15, 1, begin, (url,))
 
     except Exception as e:
         log("Caught unexpected exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
