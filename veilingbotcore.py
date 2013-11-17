@@ -6,6 +6,8 @@ from selenium import webdriver
 from raven import Client
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import DesiredCapabilities
+from credentials import MY_NAME as VV_NAME
+from tv_credentials import MY_NAME as TV_NAME
 
 ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee04785997060943ba4a78a@localhost:9000/2")
 
@@ -38,7 +40,11 @@ class VeilingAPI(object):
         log("Instructing API to place bid of %d EUR" % price)
         self.do_place_bid(price)
         time.sleep(0.1)
-        if not self.get_current_bid() >= price:
+        if self.get_current_bid() > price:
+            log("Fuck, somebody just overbid me! Returning.")
+            return
+
+        elif self.get_current_bid() < price or self.get_latest_bidder() not in (VV_NAME, TV_NAME):
             log("Uh oh, it seems that my bid did not register! Trying again just once.")
             self.do_place_bid(price)
             time.sleep(0.1)
@@ -46,6 +52,9 @@ class VeilingAPI(object):
                 log("Uh oh, it seems that my bid did not register! Screenshotting and failing hard.")
                 make_screenshot(self.browser)
                 raise RuntimeError("Placing bid failed")
+
+        else:
+            log("It seems that my bid was placed succesfully!")
 
 
 def log(msg):

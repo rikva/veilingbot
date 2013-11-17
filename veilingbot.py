@@ -200,7 +200,7 @@ def brute_force_bid(site, max_price):
     log("Winning bid: '%s'" % last_bid)
 
     # Double confirm that we have lost, cause it means that we will begin bidding again.
-    if winning_bidder not in  (VV_NAME, TV_NAME) and last_bid != my_last_bid:
+    if winning_bidder not in (VV_NAME, TV_NAME) and last_bid != my_last_bid:
         # Too bad, it sure looks like we lost
         log("Too bad, we lost")
         return False
