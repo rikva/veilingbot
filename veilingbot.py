@@ -178,6 +178,7 @@ def brute_force_bid(site, max_price):
     while site.get_remaining_secs() > 0:
         __current_bid_last_time = _current_bid
         _current_bid = site.get_current_bid()
+        log("DEBUG: Still in brute force bid mode. Current bid: %d | my last bid: %d" % (_current_bid, my_last_bid))
 
         if _current_bid != __current_bid_last_time:
             _latest_bidder = site.get_latest_bidder()
@@ -186,16 +187,15 @@ def brute_force_bid(site, max_price):
                 % (_latest_bidder, _current_bid, _remaining_secs))
 
         if _current_bid > my_last_bid and _current_bid < max_price:
-                my_last_bid = _current_bid+1
-                if my_last_bid <= max_price:
-                    log("Placing bid of %s" % my_last_bid)
-                    site.place_bid(my_last_bid)
-                else:
-                    log("Current bid is higher than or equal to my max price")
-                    return False
+            my_last_bid = _current_bid+1
+            if my_last_bid <= max_price:
+                log("Placing bid of %s" % my_last_bid)
+                site.place_bid(my_last_bid)
+            else:
+                log("Current bid is higher than or equal to my max price")
+                return False
 
-        log("DEBUG: Still in brute force bid mode. Current bid: %d | my last bid: %d" % (_current_bid, my_last_bid))
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
     # First, create a screenshot
     make_screenshot(site.browser)
