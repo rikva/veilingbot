@@ -112,7 +112,7 @@ class VakantieVeilingen(VeilingAPI):
             raise RuntimeError("FAILSAFE (this should not happen): not placing bid of %s, it's higher than %s" %
                 (price, self.max_price))
         else:
-            log("Placing bid of '%s' euro" % price )
+            log("Placing bid of '%s' euro" % price)
             ub = self.browser.find_element_by_xpath("//input[@name='bidAmount']")
             # first clear the input field!
             log('DEBUG: Clearing input field')
@@ -142,3 +142,5 @@ class VakantieVeilingen(VeilingAPI):
                     log("Could not close invisible dialog")
                 except:
                     log('Failed to close a dialog.')
+            log('DEBUG: Done closing any dialogs')
+
