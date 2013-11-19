@@ -46,27 +46,19 @@ class TicketVeiling(VeilingAPI):
             if price.is_displayed() and price.text:
                 return int(price.text)
 
-
     def get_latest_bidder(self):
-        div = wait_for_element(self.browser.find_element_by_id, "bids", max_secs=480)
-        if not div.is_displayed():
-            div = self.browser.find_element_by_id("bidHistory")
-        try:
-            last_bid = div.find_elements_by_class_name("bidHistory")[0].text
-            time_and_name = last_bid.split("\n")[2]
-            name = time_and_name.split()[1:]
-            return ' '.join(name)
-        except StaleElementReferenceException:
-            log("Caught StaleElementReferenceException")
-            log("Going to log div elements")
-            log(div)
-            log(div.find_elements_by_class_name("bidHistory"))
-            log([e.is_displayed() for e in div.find_elements_by_class_name("bidHistory")])
-            ravenclient.captureException()
+        bids = wait_for_element(self.browser.find_element_by_xpath, '//div[@id="bidWrapper"]/div[@id="bids"]')
+        splitted_bids = bids.text.split("\n")
+        # List is now in format:
+        # [u'1'                  <-- number of bid in list,
+        # u'\u20ac 17',          <-- EUR <amount>
+        # u'15:11:04 Odettaah',  <-- time and bidder
+        # ... and this for every bid
 
-        except IndexError:
-            ravenclient.captureException()
-            return "unknown"
+        # So, pick the third item of the list, split it by space and fetch the last part (and join it by spaces).
+        last_bidder = ' '.join(splitted_bids[2].split()[1:])
+
+        return last_bidder
 
     def do_login(self):
         log('Signing in')
