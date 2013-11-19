@@ -63,14 +63,12 @@ def log(msg):
         url = sys.argv[1]
     else:
         url = "NO URL"
-#    last_url_part = url.split("/")[-1].split(".")[0]
     last_url_part = url[-30:]
     try:
-        logstring =  "%s [%s] : %s" % (time.ctime(), last_url_part, str(msg))
+        logstring = "%s [%s] : %s" % (time.ctime(), last_url_part, str(msg))
         print logstring
     except:
         print time.ctime() + ' : Could not decode string!'
-        ravenclient.captureException()
 
 
 def make_screenshot(browser):
