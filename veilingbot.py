@@ -10,7 +10,7 @@ from credentials import MY_NAME as VV_NAME
 from tv_credentials import MY_NAME as TV_NAME
 from ticketveiling import TicketVeiling
 from vakantieveilingen import VakantieVeilingen
-from veilingbotcore import log, start_browser, close_cookie_dialogs, ravenclient, make_screenshot
+from veilingbotcore import log, start_browser, close_cookie_dialogs, ravenclient, make_screenshot, RAVEN_ENABLED
 
 scheduler = sched.scheduler(time.time, time.sleep)
 
@@ -113,14 +113,16 @@ def begin(url):
         log("Caught WebDriverException. Trying a refresh.")
         if SITE is None:
             log("Nope, SITE is None - capturing exception")
-            ravenclient.captureException()
+            if RAVEN_ENABLED:
+                ravenclient.captureException()
             log("Scheduling a restart")
             scheduler.enter(15, 1, begin, (url,))
             return
         try:
             SITE.browser.refresh()
         except:
-            ravenclient.captureException()
+            if RAVEN_ENABLED:
+                ravenclient.captureException()
             log("That went wrong. Restarting browser")
             SITE.browser.quit()
             scheduler.enter(15, 1, begin, (url,))
@@ -129,7 +131,8 @@ def begin(url):
         log("Caught unexpected exception: '%s'. Forcing browser quit and rescheduling restart in 60 seconds." % e.message)
         log("The exception was: '%s'" % e)
         traceback.print_exc()
-        ravenclient.captureException()
+        if RAVEN_ENABLED:
+            ravenclient.captureException()
 
 
         try:
