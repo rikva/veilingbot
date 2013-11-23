@@ -56,7 +56,11 @@ class TicketVeiling(VeilingAPI):
         # ... and this for every bid
 
         # So, pick the third item of the list, split it by space and fetch the last part (and join it by spaces).
-        last_bidder = ' '.join(splitted_bids[2].split()[1:])
+        try:
+            last_bidder = ' '.join(splitted_bids[2].split()[1:])
+        except:
+            log("FAILING ON: %s" % splitted_bids)
+            raise
 
         return last_bidder
 
