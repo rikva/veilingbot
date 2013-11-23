@@ -13,7 +13,8 @@ RAVEN_ENABLED = False
 
 if RAVEN_ENABLED:
     ravenclient = Client("http://1b6caf35463b4ea2b781d3f49efcc4ed:e8669c823ee04785997060943ba4a78a@localhost:9000/2")
-
+else:
+    ravenclient = None
 
 class VeilingAPI(object):
     def __init__(self,
