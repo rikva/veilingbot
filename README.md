@@ -6,6 +6,7 @@ git clone <repo url>
 cd veilingbot
 pip install -r requirements.txt
 ```
+Also, install phantomjs and place it in the project root. 
 
 Add hosts like facebook to hostsfile to speed up browser starts and decrease bandwidth usage
 
