@@ -1,4 +1,9 @@
-Dependencies:
+# Veilingbot
+This is my dear old veilingbot (auction bot) hobby project. 
+It has scored me some nice hot spa and sushi restaurant discount codes.
+I stopped using it a while ago, so here's the source code. 
+
+## Usage
 
 ```bash
 sudo apt-get install git python-pip tmux htop libfontconfig1 
